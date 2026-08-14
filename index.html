@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Official website of author Rayford Aquirre — fiction, nonfiction, belief, technology, and 118 ebooks." />
+  <meta name="theme-color" content="#10110f" />
+  <title>Rayford Aquirre — Author</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Rayford Aquirre home">
+      <span class="brand-mark">RA</span>
+      <span class="brand-name">Rayford Aquirre</span>
+    </a>
+    <nav aria-label="Primary">
+      <a href="#latest">Latest</a>
+      <a href="#books">Books</a>
+      <a href="#about">About</a>
+      <a class="nav-cta" href="#books">Browse 118 ebooks</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">AUTHOR · FICTION · NONFICTION</p>
+        <h1>Stories and ideas built to leave a mark.</h1>
+        <p class="hero-lede">Rayford Aquirre writes across fiction, philosophy, belief, technology, consciousness, relationships, and children's literature. One independent catalog. 118 ebooks.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#books">Explore the catalog</a>
+          <a class="button button-ghost" href="#latest">See the newest release</a>
+        </div>
+        <dl class="stats" aria-label="Catalog summary">
+          <div><dt>118</dt><dd>ebooks</dd></div>
+          <div><dt>10+</dt><dd>series & cycles</dd></div>
+          <div><dt>2026</dt><dd>current catalog</dd></div>
+        </dl>
+      </div>
+      <div class="hero-art" aria-hidden="true">
+        <div class="orbit orbit-a"></div>
+        <div class="orbit orbit-b"></div>
+        <div class="monogram">R<span>A</span></div>
+      </div>
+    </section>
+
+    <section class="latest section" id="latest">
+      <div class="section-heading">
+        <p class="eyebrow">NEW RELEASE</p>
+        <h2>MASSA</h2>
+      </div>
+      <div class="feature-grid">
+        <div class="cover-wrap">
+          <img src="assets/massa-cover.png" alt="MASSA by Rayford Aquirre book cover" class="book-cover" />
+        </div>
+        <div class="feature-copy">
+          <p class="kicker">A NOVEL</p>
+          <h3>When no one person controls the movement, responsibility moves through everyone.</h3>
+          <p><em>MASSA</em> follows a ceremonial crowd in Ossara as local decisions, signals, bodies, and pressure begin to interact in ways no individual can fully see. The novel turns collective motion itself into the engine of suspense.</p>
+          <p class="note">Newly added to the Rayford Aquirre catalog as ebook #118.</p>
+          <a class="button button-primary" href="#books" data-focus-massa>Find MASSA in the catalog</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="catalog section" id="books">
+      <div class="section-heading catalog-heading">
+        <div>
+          <p class="eyebrow">THE CATALOG</p>
+          <h2>118 ebooks. One searchable library.</h2>
+        </div>
+        <p class="catalog-intro">Search by title or narrow the catalog by broad reading area. More detailed book pages, covers, blurbs, and universal store links can be added incrementally.</p>
+      </div>
+
+      <div class="catalog-controls" role="search">
+        <label class="search-box">
+          <span class="sr-only">Search books</span>
+          <input id="searchInput" type="search" placeholder="Search title or series…" autocomplete="off" />
+        </label>
+        <div class="filters" id="filters" aria-label="Book categories"></div>
+      </div>
+      <div class="catalog-meta"><span id="resultCount">118 books</span><button id="clearSearch" class="text-button" type="button">Clear filters</button></div>
+      <div id="bookGrid" class="book-grid" aria-live="polite"></div>
+    </section>
+
+    <section class="about section" id="about">
+      <div class="about-rule"></div>
+      <div class="about-grid">
+        <div>
+          <p class="eyebrow">ABOUT THE AUTHOR</p>
+          <h2>Rayford Aquirre</h2>
+        </div>
+        <div class="about-copy">
+          <p>Rayford Aquirre is an independent author working across multiple forms and subjects, from novels and speculative fiction to philosophy, religion, artificial intelligence, consciousness, relationships, practical nonfiction, and children's literature.</p>
+          <p>This site is designed as the central index for that body of work. Individual titles can link outward to their retail destinations while the catalog remains organized in one place.</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div><strong>Rayford Aquirre</strong><span>Official author catalog</span></div>
+    <div><span id="year"></span> · Independent publishing</div>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
