@@ -23,7 +23,8 @@ function sortedBooks(list){
   return list;
 }
 function render(){
-  const q = normalize(searchInput.value.trim());
+  const rawQuery = searchInput.value.trim();
+  const q = normalize(rawQuery);
   let visible = books.filter(book => {
     const categoryMatch = activeCategory === 'All' ||
       (activeCategory === 'Nederlands' ? book.language === 'Nederlands' : book.category === activeCategory);
@@ -32,7 +33,8 @@ function render(){
     return categoryMatch && seriesMatch && (!q || haystack.includes(q));
   });
   visible = sortedBooks(visible);
-  resultCount.textContent = `${visible.length} ${visible.length === 1 ? 'book' : 'books'}`;
+  const isDefaultView = !rawQuery && activeCategory === 'All' && !seriesOnly.checked;
+  resultCount.textContent = isDefaultView ? 'Full catalog' : `${visible.length} ${visible.length === 1 ? 'book' : 'books'}`;
   grid.setAttribute('aria-busy','false');
   if(!visible.length){ grid.innerHTML = '<div class="empty-state">No books match the current filters.</div>'; return; }
   grid.innerHTML = visible.map((book) => {
