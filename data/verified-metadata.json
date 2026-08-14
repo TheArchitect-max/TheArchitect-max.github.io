@@ -86,5 +86,30 @@
       {"label":"Kobo","url":"https://www.kobo.com/us/en/ebook/the-pint-sized-prankster"},
       {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-pint-sized-prankster-ebook/9300000165942390/"}
     ]
+  },
+  "1200577": {
+    "verified": true,
+    "isbn": "9798223260158",
+    "releaseDate": "2023-11-04",
+    "language": "English",
+    "genre": "Satirical Historical Fiction",
+    "description": "Professor Witbuckle leads a troupe of time-traveling comedians through famous moments and figures from history, using anachronism and absurdity to turn the past into a comic, educational journey.",
+    "sources": [
+      {"label":"Standaard Boekhandel","url":"https://www.standaardboekhandel.be/p/the-hilarity-of-history-9798223260158"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-the-hilarity-of-history-ebook/9798223260158/14383128"}
+    ]
+  },
+  "1209633": {
+    "verified": true,
+    "isbn": "9798223972532",
+    "releaseDate": "2023-11-18",
+    "language": "English",
+    "genre": "Fiction / Horror",
+    "description": "Four friends on an annual camping trip in the Scottish Highlands become trapped in a repeating day governed by a corrective mechanism called The Logic. Escaping requires them to confront the unresolved lies, grievances, and fears embedded in their friendship.",
+    "sources": [
+      {"label":"Apple Books","url":"https://books.apple.com/be/book/chronicles-of-the-time-loop-breaking-the-eternal-cycle/id6472595222?l=nl"},
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/chronicles-of-the-time-loop-breaking-the-eternal-cycle-ebook/9300000167424868/"},
+      {"label":"Barnes & Noble","url":"https://www.barnesandnoble.com/w/chronicles-of-the-time-loop-rayford-aquirre/1144385343"}
+    ]
   }
 }
