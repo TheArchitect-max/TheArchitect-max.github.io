@@ -1,0 +1,16 @@
+{
+  "name": "Rayford Aquirre",
+  "short_name": "Rayford Aquirre",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#10110f",
+  "theme_color": "#10110f",
+  "description": "Official author website and ebook catalog of Rayford Aquirre.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
