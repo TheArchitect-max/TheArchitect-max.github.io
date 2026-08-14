@@ -2,6 +2,7 @@
 .card-main-link:hover .card-title { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:4px; }
 .card-actions { display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-end; }
 .card-link.secondary { color:var(--muted); border-bottom-color:var(--muted); }
+.card-language { display:inline-block; margin-left:8px; padding:2px 7px; border:1px solid rgba(211,255,86,.35); border-radius:999px; color:var(--accent); font-size:.66rem; letter-spacing:.05em; }
 
 .book-page-body { min-height:100vh; }
 .book-detail-shell { max-width:var(--max); margin:0 auto; padding:54px 24px 120px; }
