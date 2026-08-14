@@ -19,7 +19,6 @@ function identityMarkup(book) {
 }
 function descriptionFor(book, meta={}) {
   if(meta.description) return meta.description;
-  if(book.title === 'MASSA') return 'In Ossara, a ceremonial crowd becomes a system no single participant can fully see. Local decisions, authentic signals, physical pressure, and conflicting responsibilities propagate from body to body until movement itself becomes the engine of suspense.';
   if(book.series) return `Part of ${book.series}. This page is the catalog record for the ebook by Rayford Aquirre. A verified retail description will be added when a reliable public source is available.`;
   return 'This page is the catalog record for this ebook by Rayford Aquirre. A verified retail description will be added when a reliable public source is available.';
 }
