@@ -8,7 +8,7 @@ const seriesOnly = document.getElementById('seriesOnly');
 let books = [];
 let activeCategory = 'All';
 
-function normalize(v=''){ return v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
+function normalize(v=''){ return String(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 function escapeHtml(value='') {
   return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
 }
@@ -25,9 +25,10 @@ function sortedBooks(list){
 function render(){
   const q = normalize(searchInput.value.trim());
   let visible = books.filter(book => {
-    const categoryMatch = activeCategory === 'All' || book.category === activeCategory;
+    const categoryMatch = activeCategory === 'All' ||
+      (activeCategory === 'Nederlands' ? book.language === 'Nederlands' : book.category === activeCategory);
     const seriesMatch = !seriesOnly.checked || Boolean(book.series);
-    const haystack = normalize(`${book.title} ${book.series || ''} ${book.category || ''}`);
+    const haystack = normalize(`${book.title} ${book.series || ''} ${book.category || ''} ${book.language || ''}`);
     return categoryMatch && seriesMatch && (!q || haystack.includes(q));
   });
   visible = sortedBooks(visible);
@@ -40,6 +41,7 @@ function render(){
     const title = escapeHtml(book.title || 'Untitled');
     const series = escapeHtml(book.series || '');
     const category = escapeHtml(book.category || 'Book');
+    const language = book.language === 'Nederlands' ? '<span class="card-language">Nederlands</span>' : '';
     const external = book.url && book.url.startsWith('http') ? book.url : '';
     const detailUrl = `book.html?id=${encodeURIComponent(book.id)}`;
     return `<article class="book-card ${isMassa ? 'massa' : ''}" data-title="${title}">
@@ -49,14 +51,16 @@ function render(){
         <div class="card-series">${series}</div>
       </a>
       <div class="card-bottom">
-        <span class="card-category">${category}</span>
+        <span class="card-category">${category}${language}</span>
         <div class="card-actions"><a class="card-link" href="${detailUrl}">Details</a>${external ? `<a class="card-link secondary" href="${escapeHtml(external)}" target="_blank" rel="noopener noreferrer">D2D ↗</a>` : ''}</div>
       </div>
     </article>`;
   }).join('');
 }
 function buildFilters(){
-  const categories = ['All', ...new Set(books.map(b => b.category).filter(Boolean))];
+  const categories = ['All'];
+  if(books.some(b => b.language === 'Nederlands')) categories.push('Nederlands');
+  categories.push(...new Set(books.map(b => b.category).filter(Boolean)));
   filters.innerHTML = categories.map(cat => `<button type="button" class="filter-button ${cat==='All'?'active':''}" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`).join('');
   filters.addEventListener('click', e => {
     const btn = e.target.closest('[data-category]'); if(!btn) return;
@@ -71,10 +75,11 @@ Promise.all([
     if(!r.ok) throw new Error(`Catalog load failed: ${path}`);
     return r.json();
   }))),
-  fetch('data/series-map.json').then(r => r.ok ? r.json() : {})
+  fetch('data/series-map.json').then(r => r.ok ? r.json() : {}),
+  fetch('data/language-map.json').then(r => r.ok ? r.json() : {})
 ])
-  .then(([parts, seriesMap]) => {
-    books = parts.flat().map(book => ({...book, series: book.series || seriesMap[book.id] || ''}));
+  .then(([parts, seriesMap, languageMap]) => {
+    books = parts.flat().map(book => ({...book, series: book.series || seriesMap[book.id] || '', language: languageMap[book.id] || ''}));
     buildFilters();
     render();
   })
