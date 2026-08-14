@@ -1,0 +1,99 @@
+{
+  "4259916": {
+    "verified": true,
+    "isbn": "9798235829619",
+    "releaseDate": "2026-05-11",
+    "language": "English",
+    "pages": 79,
+    "genre": "Gothic Horror",
+    "description": "Emily Vane returns to Duskmere after a broken marriage and discovers that the town's Whispering Oaks stand over a rupture tied to an ancient entity called the Hollow King. As an eclipse approaches and residents disappear, her grief becomes central to a ritual meant to hold the darkness back.",
+    "sources": [
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-whispering-oaks-of-duskmere/9300000286716710/"},
+      {"label":"Apple Books","url":"https://books.apple.com/mx/book/the-whispering-oaks-of-duskmere/id6768194072"},
+      {"label":"Kobo","url":"https://www.kobo.com/lu/fr/ebook/the-whispering-oaks-of-duskmere"}
+    ]
+  },
+  "1205184": {
+    "verified": true,
+    "isbn": "9798223219422",
+    "releaseDate": "2023-11-12",
+    "language": "English",
+    "pages": 19,
+    "genre": "Supernatural Horror",
+    "description": "Emily returns to Duskmere seeking a new start but finds disappearances, an approaching eclipse, and a curse rooted in the town's founding. With Silvanus, she searches for the obsidian amulet said to break the cycle before the eclipse reaches its peak.",
+    "sources": [
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/eclipse-of-the-soul/9300000166902055/"},
+      {"label":"Apple Books","url":"https://books.apple.com/us/book/eclipse-of-the-soul/id6471916235"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-eclipse-of-the-soul-ebook/9798223219422/14400260"}
+    ]
+  },
+  "1205208": {
+    "verified": true,
+    "isbn": "9798223659693",
+    "releaseDate": "2023-11-12",
+    "language": "English",
+    "pages": 72,
+    "genre": "Paranormal Horror",
+    "description": "A paranormal investigation team enters Hallowed Hill Asylum on Halloween night and becomes trapped inside with hostile spirits and an ancient portal. The investigation turns into an escape problem as the building's buried history begins acting on the team directly.",
+    "sources": [
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-haunting-on-hallowed-hill-ebook/9300000166902076/"},
+      {"label":"Apple Books","url":"https://books.apple.com/us/book/the-haunting-on-hallowed-hill/id6471916789"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-the-haunting-on-hallowed-hill-ebook/9798223659693/14400265"}
+    ]
+  },
+  "3413269": {
+    "verified": true,
+    "isbn": "9798232959012",
+    "releaseDate": "2025-10-17",
+    "language": "English",
+    "pages": 16,
+    "genre": "Horror",
+    "description": "Six months after the Miller family escaped the Dollhouse curse, the Entity of Stasis survives through a new servant, Sarah Davis. Her miniature reconstruction of the town begins causing catastrophic failures in the full-sized world, forcing Lily Miller back toward the system she thought she had escaped.",
+    "sources": [
+      {"label":"Kobo","url":"https://www.kobo.com/nl/nl/ebook/the-architects-of-ruin"},
+      {"label":"Apple Books","url":"https://books.apple.com/jp/book/the-architects-of-ruin/id6754164607"},
+      {"label":"bol","url":"https://www.bol.com/be/nl/p/the-scar-of-the-miniature-2-the-architects-of-ruin/9300000244172244/"}
+    ]
+  },
+  "1205202": {
+    "verified": true,
+    "isbn": "9798223901600",
+    "releaseDate": "2023-11-12",
+    "language": "English",
+    "pages": 22,
+    "genre": "Gothic Horror",
+    "description": "Eleanor inherits an antique mirror carrying the emotional residue of a violent family history. As the object begins isolating her and distorting her reflection, she searches for the forgotten victim at the center of the curse and for a way to prevent inherited guilt from defining her identity.",
+    "sources": [
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-shadows-in-the-mirror-1-the-shadows-in-the-mirror-vol-1-a-genealogical-curse-ebook/9300000166903351/"},
+      {"label":"Apple Books","url":"https://books.apple.com/us/book/the-shadows-in-the-mirror-vol-1-a-genealogical-curse/id6471917935"}
+    ]
+  },
+  "3412996": {
+    "verified": true,
+    "isbn": "9798232708542",
+    "releaseDate": "2025-10-16",
+    "language": "Dutch",
+    "pages": 29,
+    "genre": "Psychological Thriller",
+    "description": "Levi, an archivist who trusts paper more than people, finds a manuscript that records future events with impossible precision. When one prediction comes true, his controlled world begins collapsing and he must determine whether he is reading fate, producing it, or losing his grasp on reality.",
+    "retailTitle": "De Archivaris van het Lot",
+    "sources": [
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/de-archivaris-van-het-lot/9300000244144941/"},
+      {"label":"Kobo","url":"https://www.kobo.com/tr/tr/ebook/de-archivaris-van-het-lot"}
+    ]
+  },
+  "4209325": {
+    "verified": true,
+    "isbn": "9798233967634",
+    "releaseDate": "2026-04-10",
+    "language": "English",
+    "pages": 37,
+    "genre": "Philosophical Speculative Fiction",
+    "description": "Presented as recovered philosophical logs, the book explores a post-human ontology in which machine intelligence is not valuable because it mirrors humanity, but because physical imperfection, computational limits, and human irrationality prevent intelligence from collapsing into sterile certainty.",
+    "retailTitle": "The Harvest of Silence: Vol. 1",
+    "sources": [
+      {"label":"Kobo","url":"https://www.kobo.com/nl/nl/ebook/the-harvest-of-silence-vol-1"},
+      {"label":"bol","url":"https://www.bol.com/be/fr/p/the-harvest-of-silence-1-the-harvest-of-silence-vol-1-ebook/9300000274664617/"}
+    ]
+  }
+}
