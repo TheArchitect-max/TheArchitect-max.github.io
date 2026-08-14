@@ -1,0 +1,90 @@
+{
+  "1200058": {
+    "verified": true,
+    "isbn": "9798215018408",
+    "releaseDate": "2023-11-04",
+    "language": "English",
+    "pages": 126,
+    "genre": "Children's Fantasy",
+    "description": "Sugarbrook's familiar sweetness becomes dangerous when magic begins preserving beloved things so completely that change itself is threatened. The story follows the attempt to undo that spell and restore a living, changing community.",
+    "retailTitle": "Adventures in Sugarbrook: The Magician Who Made the Village Too Sweet",
+    "sources": [
+      {"label":"Rakuten Kobo","url":"https://books.rakuten.co.jp/rk/fc16eb451e3c38448b4782a710311a12/"},
+      {"label":"Apple Books","url":"https://books.apple.com/ca/book/adventures-in-sugarbrook-a-sweet-fantasy-tale-of/id6471373933"}
+    ]
+  },
+  "1199159": {
+    "verified": true,
+    "isbn": "9798223152521",
+    "releaseDate": "2023-11-03",
+    "language": "English",
+    "genre": "Children's Fantasy",
+    "description": "A skeptical ten-year-old enters a circus that openly breaks the laws of physics and discovers that its survival depends on whether genuine wonder can overcome her certainty that every marvel is only a trick.",
+    "sources": [
+      {"label":"bol","url":"https://www.bol.com/be/nl/p/the-grand-spectacular-a-circus-of-absurdity-ebook/9300000165908441/"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-the-grand-spectacular-a-circus-of-absurdity-ebook/9798223152521/14374668"}
+    ]
+  },
+  "2865239": {
+    "verified": true,
+    "isbn": "9798231987429",
+    "releaseDate": "2025-05-01",
+    "language": "English",
+    "pages": 48,
+    "genre": "Young Adult Fantasy",
+    "description": "Historian Aurelius searches for the Heartstone as the kingdom of Veridion decays around him. Joined by a disgraced knight and a woman driven by vengeance, he must decide whether immense power can ever be used without reproducing the destruction it promises to cure.",
+    "sources": [
+      {"label":"Apple Books","url":"https://books.apple.com/us/book/the-lost-chronicles-of-veridion/id6745363271"},
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-lost-chronicles-of-veridion-ebook/9300000230750746/"}
+    ]
+  },
+  "4259873": {
+    "verified": true,
+    "releaseDate": "2026-05-10",
+    "language": "English",
+    "pages": 142,
+    "genre": "Personal Development",
+    "description": "A systems-oriented framework for intentional personal change. The book treats human beings as biological and narrative systems and examines how attention, choice, and repeated action can interrupt inherited patterns and support purposeful self-organization.",
+    "sources": [
+      {"label":"Apple Books","url":"https://books.apple.com/us/book/built-for-more/id6768184467"}
+    ]
+  },
+  "2866025": {
+    "verified": true,
+    "isbn": "9798231192632",
+    "releaseDate": "2025-05-02",
+    "language": "English",
+    "pages": 50,
+    "genre": "Psychological Fiction",
+    "description": "Anna's isolated life is shaped by addiction, trauma, and a controlling relationship that has taught her to distrust the world outside. As that constructed reality fractures, she is forced to confront manipulation, family ghosts, and the possibility that protection has become captivity.",
+    "sources": [
+      {"label":"Apple Books","url":"https://books.apple.com/us/book/the-echoes-of-silence/id6745405443"},
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-echoes-of-silence-ebook/9300000230775932/"}
+    ]
+  },
+  "1205291": {
+    "verified": true,
+    "isbn": "9798223362326",
+    "releaseDate": "2023-11-12",
+    "language": "English",
+    "genre": "Horror",
+    "description": "A family seeking a quieter life moves into an isolated cabin in a forest where unexplained cries and increasingly hostile phenomena turn refuge into a survival problem. The woods become both setting and adversary as the family searches for the source of the threat.",
+    "sources": [
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-wailing-woods-ebook/9300000166904402/"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-the-wailing-woods-ebook/9798223362326/14400506"}
+    ]
+  },
+  "1199466": {
+    "verified": true,
+    "isbn": "9798223699675",
+    "releaseDate": "2023-11-03",
+    "language": "English",
+    "pages": 34,
+    "genre": "Children's Humor",
+    "description": "In a town where adults have forgotten how to laugh, a mysterious young prankster uses absurd surprises and playful disruptions to restore humor, connection, and a less rigid way of living.",
+    "sources": [
+      {"label":"Kobo","url":"https://www.kobo.com/us/en/ebook/the-pint-sized-prankster"},
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-pint-sized-prankster-ebook/9300000165942390/"}
+    ]
+  }
+}
