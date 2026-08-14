@@ -44,13 +44,14 @@ function renderRelated(book, books) {
   relatedBooks.innerHTML = matches.map(b => `<a class="related-card" href="book.html?id=${encodeURIComponent(b.id)}"><span>${escapeHtml(b.series || '')}</span><strong>${escapeHtml(b.title)}</strong></a>`).join('');
 }
 function renderFacts(book, meta={}) {
+  const language = book.language || meta.language;
   const rows = [
     ['Format','Ebook'],
     ['Catalog ID',book.id],
     ['Category',meta.genre || book.category || 'Book'],
+    ['Language',language],
     ['ISBN',meta.isbn],
     ['Release date',meta.releaseDate],
-    ['Language',meta.language],
     ['Pages',meta.pages]
   ].filter(([,value]) => value !== undefined && value !== null && value !== '');
   return rows.map(([label,value]) => `<div><dt>${escapeHtml(label)}</dt><dd>${escapeHtml(value)}</dd></div>`).join('');
@@ -65,13 +66,14 @@ const id = params.get('id');
 Promise.all([
   Promise.all(['data/books-1.json','data/books-2.json','data/books-3.json','data/books-4.json'].map(path=>fetch(path).then(r=>r.json()))),
   fetch('data/series-map.json').then(r=>r.json()),
+  fetch('data/language-map.json').then(r=>r.ok?r.json():{}),
   Promise.all([
     fetch('data/verified-metadata.json').then(r=>r.ok?r.json():{}),
     fetch('data/verified-metadata-2.json').then(r=>r.ok?r.json():{})
   ])
-]).then(([parts, seriesMap, metadataParts]) => {
+]).then(([parts, seriesMap, languageMap, metadataParts]) => {
   const verifiedMetadata = Object.assign({}, ...metadataParts);
-  const books = parts.flat().map(b => ({...b, series: b.series || seriesMap[b.id] || ''}));
+  const books = parts.flat().map(b => ({...b, series: b.series || seriesMap[b.id] || '', language: languageMap[b.id] || ''}));
   const book = books.find(b => b.id === id);
   if(!book) throw new Error('Book not found');
   const meta = verifiedMetadata[book.id] || {};
@@ -80,13 +82,13 @@ Promise.all([
   detail.innerHTML = `
     <div class="detail-identity-column">${identityMarkup(book)}</div>
     <div class="detail-copy">
-      <p class="eyebrow">${escapeHtml(meta.genre || book.category || 'BOOK')}</p>
+      <p class="eyebrow">${escapeHtml(book.language === 'Nederlands' ? 'NEDERLANDS' : (meta.genre || book.category || 'BOOK'))}</p>
       <h1>${escapeHtml(meta.retailTitle || book.title)}</h1>
       ${book.series ? `<p class="detail-series">${escapeHtml(book.series)}</p>` : ''}
       <p class="detail-author">by <strong>Rayford Aquirre</strong></p>
       ${meta.verified ? '<p class="verified-badge">Verified metadata</p>' : ''}
       <p class="detail-description">${escapeHtml(descriptionFor(book, meta))}</p>
-      <div class="detail-actions">${external}<a class="button button-ghost" href="index.html#books">Browse all 118 ebooks</a></div>
+      <div class="detail-actions">${external}<a class="button button-ghost" href="index.html#books">Browse all ebooks</a></div>
       <dl class="detail-facts">${renderFacts(book, meta)}</dl>
       ${renderSources(meta)}
     </div>`;
