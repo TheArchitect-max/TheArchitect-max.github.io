@@ -42,10 +42,23 @@ function buildFilters(){
     render();
   });
 }
-fetch('data/books.json')
-  .then(r => { if(!r.ok) throw new Error('Catalog load failed'); return r.json(); })
-  .then(data => { books = data; buildFilters(); render(); })
+
+Promise.all([
+  'data/books-1.json',
+  'data/books-2.json',
+  'data/books-3.json',
+  'data/books-4.json'
+].map(path => fetch(path).then(r => {
+  if(!r.ok) throw new Error(`Catalog load failed: ${path}`);
+  return r.json();
+})))
+  .then(parts => {
+    books = parts.flat();
+    buildFilters();
+    render();
+  })
   .catch(err => { grid.innerHTML = `<div class="empty-state">Catalog could not load. ${err.message}</div>`; });
+
 searchInput.addEventListener('input', render);
 clearSearch.addEventListener('click', () => { searchInput.value=''; activeCategory='All'; [...filters.children].forEach(el => el.classList.toggle('active', el.dataset.category==='All')); render(); });
 document.querySelector('[data-focus-massa]').addEventListener('click', () => { setTimeout(()=>{ searchInput.value='MASSA'; activeCategory='All'; render(); searchInput.focus(); },350); });
