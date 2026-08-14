@@ -3,15 +3,59 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Official website of author Rayford Aquirre — fiction, nonfiction, belief, technology, and 118 ebooks." />
+  <meta name="description" content="Official website of author Rayford Aquirre — fiction, nonfiction, belief, technology, consciousness, and a catalog of 118 ebooks." />
   <meta name="theme-color" content="#10110f" />
-  <title>Rayford Aquirre — Author</title>
+  <meta name="color-scheme" content="dark" />
+  <meta name="author" content="Rayford Aquirre" />
+  <link rel="canonical" href="https://thearchitect-max.github.io/" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="manifest" href="site.webmanifest" />
+
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Rayford Aquirre" />
+  <meta property="og:title" content="Rayford Aquirre — Official Author Website" />
+  <meta property="og:description" content="Explore 118 ebooks by Rayford Aquirre across fiction, nonfiction, belief, technology, consciousness, relationships, and children's literature." />
+  <meta property="og:url" content="https://thearchitect-max.github.io/" />
+  <meta property="og:image" content="https://thearchitect-max.github.io/assets/massa-cover.jpg" />
+  <meta property="og:image:alt" content="MASSA by Rayford Aquirre" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Rayford Aquirre — Official Author Website" />
+  <meta name="twitter:description" content="One independent catalog. 118 ebooks." />
+  <meta name="twitter:image" content="https://thearchitect-max.github.io/assets/massa-cover.jpg" />
+
+  <title>Rayford Aquirre — Official Author Website</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="styles.css" />
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Person",
+        "@id": "https://thearchitect-max.github.io/#author",
+        "name": "Rayford Aquirre",
+        "url": "https://thearchitect-max.github.io/",
+        "jobTitle": "Author"
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://thearchitect-max.github.io/#website",
+        "url": "https://thearchitect-max.github.io/",
+        "name": "Rayford Aquirre",
+        "description": "Official author website and ebook catalog of Rayford Aquirre.",
+        "publisher": {"@id": "https://thearchitect-max.github.io/#author"},
+        "inLanguage": "en"
+      }
+    ]
+  }
+  </script>
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
+
   <header class="site-header">
     <a class="brand" href="#top" aria-label="Rayford Aquirre home">
       <span class="brand-mark">RA</span>
@@ -25,8 +69,8 @@
     </nav>
   </header>
 
-  <main id="top">
-    <section class="hero">
+  <main id="main-content">
+    <section class="hero" id="top">
       <div class="hero-copy">
         <p class="eyebrow">AUTHOR · FICTION · NONFICTION</p>
         <h1>Stories and ideas built to leave a mark.</h1>
@@ -55,7 +99,7 @@
       </div>
       <div class="feature-grid">
         <div class="cover-wrap">
-          <img src="assets/massa-cover.jpg" alt="MASSA by Rayford Aquirre book cover" class="book-cover" />
+          <img src="assets/massa-cover.jpg" alt="MASSA by Rayford Aquirre book cover" class="book-cover" width="1200" height="1920" loading="eager" />
         </div>
         <div class="feature-copy">
           <p class="kicker">A NOVEL</p>
@@ -73,18 +117,34 @@
           <p class="eyebrow">THE CATALOG</p>
           <h2>118 ebooks. One searchable library.</h2>
         </div>
-        <p class="catalog-intro">Search by title or narrow the catalog by broad reading area. More detailed book pages, covers, blurbs, and universal store links can be added incrementally.</p>
+        <p class="catalog-intro">Search by title or series, filter by reading area, show only series titles, or change the sort order. Book-specific covers, blurbs, and universal store links can be added as the catalog is enriched.</p>
       </div>
 
-      <div class="catalog-controls" role="search">
+      <div class="catalog-controls" role="search" aria-label="Search and filter the book catalog">
         <label class="search-box">
           <span class="sr-only">Search books</span>
           <input id="searchInput" type="search" placeholder="Search title or series…" autocomplete="off" />
         </label>
         <div class="filters" id="filters" aria-label="Book categories"></div>
       </div>
-      <div class="catalog-meta"><span id="resultCount">118 books</span><button id="clearSearch" class="text-button" type="button">Clear filters</button></div>
-      <div id="bookGrid" class="book-grid" aria-live="polite"></div>
+
+      <div class="catalog-toolbar">
+        <label class="sort-control" for="sortSelect">
+          <span>Sort</span>
+          <select id="sortSelect">
+            <option value="catalog">Catalog order</option>
+            <option value="title">Title A–Z</option>
+            <option value="series">Series</option>
+          </select>
+        </label>
+        <label class="series-toggle">
+          <input id="seriesOnly" type="checkbox" />
+          <span>Series titles only</span>
+        </label>
+        <div class="catalog-meta"><span id="resultCount">118 books</span><button id="clearSearch" class="text-button" type="button">Reset</button></div>
+      </div>
+
+      <div id="bookGrid" class="book-grid" aria-live="polite" aria-busy="true"></div>
     </section>
 
     <section class="about section" id="about">
@@ -96,7 +156,7 @@
         </div>
         <div class="about-copy">
           <p>Rayford Aquirre is an independent author working across multiple forms and subjects, from novels and speculative fiction to philosophy, religion, artificial intelligence, consciousness, relationships, practical nonfiction, and children's literature.</p>
-          <p>This site is designed as the central index for that body of work. Individual titles can link outward to their retail destinations while the catalog remains organized in one place.</p>
+          <p>This website serves as the central index for that body of work. Individual titles link outward to their available retail or distribution pages while the catalog remains organized in one place.</p>
         </div>
       </div>
     </section>
