@@ -14,8 +14,8 @@ function seriesRoot(series='') {
 function initials(title='') {
   return title.replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean).slice(0,3).map(w=>w[0]).join('').toUpperCase();
 }
-function coverMarkup(book) {
-  return `<div class="generated-cover" aria-label="Typographic cover treatment for ${escapeHtml(book.title)}"><span class="generated-cover-author">RAYFORD AQUIRRE</span><strong>${escapeHtml(book.title)}</strong><span class="generated-cover-mark">${escapeHtml(initials(book.title))}</span></div>`;
+function identityMarkup(book) {
+  return `<div class="book-identity" aria-label="Typographic identity for ${escapeHtml(book.title)}"><span class="book-identity-author">RAYFORD AQUIRRE</span><strong>${escapeHtml(book.title)}</strong><span class="book-identity-mark">${escapeHtml(initials(book.title))}</span></div>`;
 }
 function descriptionFor(book, meta={}) {
   if(meta.description) return meta.description;
@@ -65,8 +65,12 @@ const id = params.get('id');
 Promise.all([
   Promise.all(['data/books-1.json','data/books-2.json','data/books-3.json','data/books-4.json'].map(path=>fetch(path).then(r=>r.json()))),
   fetch('data/series-map.json').then(r=>r.json()),
-  fetch('data/verified-metadata.json').then(r=>r.ok?r.json():{})
-]).then(([parts, seriesMap, verifiedMetadata]) => {
+  Promise.all([
+    fetch('data/verified-metadata.json').then(r=>r.ok?r.json():{}),
+    fetch('data/verified-metadata-2.json').then(r=>r.ok?r.json():{})
+  ])
+]).then(([parts, seriesMap, metadataParts]) => {
+  const verifiedMetadata = Object.assign({}, ...metadataParts);
   const books = parts.flat().map(b => ({...b, series: b.series || seriesMap[b.id] || ''}));
   const book = books.find(b => b.id === id);
   if(!book) throw new Error('Book not found');
@@ -74,7 +78,7 @@ Promise.all([
   updateMetadata(book, meta);
   const external = book.url && book.url.startsWith('http') ? `<a class="button button-primary" href="${escapeHtml(book.url)}" target="_blank" rel="noopener noreferrer">View on Draft2Digital ↗</a>` : '';
   detail.innerHTML = `
-    <div class="detail-cover-column">${coverMarkup(book)}</div>
+    <div class="detail-identity-column">${identityMarkup(book)}</div>
     <div class="detail-copy">
       <p class="eyebrow">${escapeHtml(meta.genre || book.category || 'BOOK')}</p>
       <h1>${escapeHtml(meta.retailTitle || book.title)}</h1>
