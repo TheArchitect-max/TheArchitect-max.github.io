@@ -2,3 +2,7 @@ User-agent: *
 Allow: /
 
 Sitemap: https://thearchitect-max.github.io/sitemap.xml
+Sitemap: https://thearchitect-max.github.io/project-calculators/sitemap-core.xml
+Sitemap: https://thearchitect-max.github.io/project-calculators/sitemap-categories.xml
+Sitemap: https://thearchitect-max.github.io/project-calculators/sitemap-calculators.xml
+Sitemap: https://thearchitect-max.github.io/project-calculators/sitemap-reference.xml
