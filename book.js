@@ -6,7 +6,7 @@ const shell = document.getElementById('book-main');
 document.getElementById('year').textContent = new Date().getFullYear();
 
 function escapeHtml(value='') {
-  return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  return String(value).replace(/[&<>'\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[ch]));
 }
 function seriesRoot(series='') {
   return series.replace(/,\s*#\d+\s*$/,'').trim();
@@ -15,10 +15,7 @@ function initials(title='') {
   return title.replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean).slice(0,3).map(w=>w[0]).join('').toUpperCase();
 }
 function coverMarkup(book) {
-  if(book.title === 'MASSA') {
-    return '<img class="detail-cover-image" src="assets/massa-cover.jpg" alt="MASSA by Rayford Aquirre cover" />';
-  }
-  return `<div class="generated-cover" aria-label="Cover placeholder for ${escapeHtml(book.title)}"><span class="generated-cover-author">RAYFORD AQUIRRE</span><strong>${escapeHtml(book.title)}</strong><span class="generated-cover-mark">${escapeHtml(initials(book.title))}</span></div>`;
+  return `<div class="generated-cover" aria-label="Typographic cover treatment for ${escapeHtml(book.title)}"><span class="generated-cover-author">RAYFORD AQUIRRE</span><strong>${escapeHtml(book.title)}</strong><span class="generated-cover-mark">${escapeHtml(initials(book.title))}</span></div>`;
 }
 function descriptionFor(book, meta={}) {
   if(meta.description) return meta.description;
