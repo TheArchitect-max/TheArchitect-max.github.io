@@ -1,0 +1,38 @@
+.card-main-link { display:block; }
+.card-main-link:hover .card-title { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:4px; }
+.card-actions { display:flex; flex-wrap:wrap; gap:12px; justify-content:flex-end; }
+.card-link.secondary { color:var(--muted); border-bottom-color:var(--muted); }
+
+.book-page-body { min-height:100vh; }
+.book-detail-shell { max-width:var(--max); margin:0 auto; padding:54px 24px 120px; }
+.back-link { display:inline-block; color:var(--muted); margin-bottom:42px; font-size:.86rem; }
+.back-link:hover { color:var(--paper); }
+.book-detail { display:grid; grid-template-columns:minmax(260px,420px) 1fr; gap:clamp(44px,8vw,110px); align-items:start; }
+.detail-cover-column { position:sticky; top:110px; }
+.detail-cover-image,.generated-cover { width:100%; aspect-ratio:5/8; box-shadow:0 30px 80px rgba(0,0,0,.48); border-radius:3px; }
+.detail-cover-image { object-fit:cover; }
+.generated-cover { background:linear-gradient(145deg,#20231d,#0c0e0b); border:1px solid rgba(241,239,231,.18); padding:34px 28px; display:flex; flex-direction:column; justify-content:space-between; overflow:hidden; position:relative; }
+.generated-cover::after { content:""; position:absolute; width:260px; height:260px; border:1px solid rgba(211,255,86,.25); border-radius:50%; right:-110px; bottom:80px; }
+.generated-cover-author { font-size:.67rem; letter-spacing:.18em; color:var(--muted); position:relative; z-index:1; }
+.generated-cover strong { font-family:"Libre Caslon Display",Georgia,serif; font-weight:400; font-size:clamp(1.8rem,3vw,3.2rem); line-height:1.02; position:relative; z-index:1; }
+.generated-cover-mark { color:var(--accent); font-size:.78rem; letter-spacing:.16em; position:relative; z-index:1; }
+.detail-copy { padding-top:20px; }
+.detail-copy h1 { font-size:clamp(3rem,6vw,6.2rem); line-height:.94; max-width:820px; }
+.detail-series { color:var(--accent); font-size:.88rem; letter-spacing:.06em; margin:24px 0 0; }
+.detail-author { color:var(--muted); margin:15px 0 0; }
+.detail-author strong { color:var(--paper); }
+.detail-description { max-width:760px; font-size:1.12rem; color:#c8c9c0; margin:34px 0 0; }
+.detail-actions { display:flex; flex-wrap:wrap; gap:12px; margin-top:32px; }
+.detail-facts { margin:54px 0 0; padding-top:26px; border-top:1px solid var(--line); display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
+.detail-facts div { min-width:0; }
+.detail-facts dt { font-size:.7rem; text-transform:uppercase; letter-spacing:.13em; color:var(--muted); }
+.detail-facts dd { margin:8px 0 0; font-size:.9rem; overflow-wrap:anywhere; }
+.related-section { margin-top:110px; padding-top:60px; border-top:1px solid var(--line); }
+.related-section h2 { font-size:clamp(2.5rem,5vw,5rem); }
+.related-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin-top:34px; }
+.related-card { border:1px solid var(--line); background:var(--bg-soft); border-radius:var(--radius); padding:24px; min-height:160px; display:flex; flex-direction:column; justify-content:space-between; transition:.2s ease; }
+.related-card:hover { transform:translateY(-3px); border-color:rgba(241,239,231,.3); }
+.related-card span { color:var(--muted); font-size:.74rem; }
+.related-card strong { font-family:"Libre Caslon Display",Georgia,serif; font-size:1.35rem; font-weight:400; line-height:1.08; margin-top:20px; }
+@media (max-width:900px){ .book-detail{grid-template-columns:1fr}.detail-cover-column{position:static;max-width:360px}.related-grid{grid-template-columns:1fr 1fr}.detail-facts{grid-template-columns:1fr 1fr} }
+@media (max-width:620px){ .book-detail-shell{padding:34px 20px 80px}.detail-cover-column{max-width:300px}.detail-copy h1{font-size:clamp(2.7rem,14vw,4.6rem)}.detail-facts,.related-grid{grid-template-columns:1fr}.card-actions{gap:9px}.card-link.secondary{display:none} }
