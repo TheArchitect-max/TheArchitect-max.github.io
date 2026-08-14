@@ -14,7 +14,7 @@ function normalize(value='') {
 function groupCollections(books, verified) {
   const groups = new Map();
   books.forEach(book => {
-    const key = book.category || 'Uncategorized';
+    const key = book.language === 'Nederlands' ? 'Nederlands' : (book.category || 'Uncategorized');
     if(!groups.has(key)) groups.set(key, []);
     groups.get(key).push({...book, verified:Boolean(verified[book.id]?.verified)});
   });
@@ -24,7 +24,11 @@ function groupCollections(books, verified) {
       items: items.sort((a,b)=>a.title.localeCompare(b.title)),
       verified: items.filter(item=>item.verified).length
     }))
-    .sort((a,b)=>b.items.length-a.items.length || a.name.localeCompare(b.name));
+    .sort((a,b) => {
+      if(a.name === 'Nederlands') return -1;
+      if(b.name === 'Nederlands') return 1;
+      return b.items.length-a.items.length || a.name.localeCompare(b.name);
+    });
 }
 function render(groups) {
   const q = normalize(search.value.trim());
@@ -36,7 +40,7 @@ function render(groups) {
   grid.setAttribute('aria-busy','false');
   if(!visible.length){ grid.innerHTML = '<div class="empty-state">No collection matches this search.</div>'; return; }
   grid.innerHTML = visible.map((group,index)=>`
-    <section class="collection-card">
+    <section class="collection-card ${group.name === 'Nederlands' ? 'language-collection' : ''}">
       <div class="collection-head">
         <span class="collection-index">${String(index+1).padStart(2,'0')}</span>
         <div>
@@ -53,9 +57,10 @@ function render(groups) {
 Promise.all([
   Promise.all(['data/books-1.json','data/books-2.json','data/books-3.json','data/books-4.json'].map(path=>fetch(path).then(r=>r.json()))),
   fetch('data/verified-metadata.json').then(r=>r.ok?r.json():{}),
-  fetch('data/verified-metadata-2.json').then(r=>r.ok?r.json():{})
-]).then(([parts, verifiedA, verifiedB])=>{
-  const books = parts.flat();
+  fetch('data/verified-metadata-2.json').then(r=>r.ok?r.json():{}),
+  fetch('data/language-map.json').then(r=>r.ok?r.json():{})
+]).then(([parts, verifiedA, verifiedB, languageMap])=>{
+  const books = parts.flat().map(book => ({...book, language: languageMap[book.id] || ''}));
   const verified = {...verifiedA,...verifiedB};
   const groups = groupCollections(books, verified);
   collectionCount.textContent = groups.length;
