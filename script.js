@@ -38,7 +38,6 @@ function render(){
   grid.setAttribute('aria-busy','false');
   if(!visible.length){ grid.innerHTML = '<div class="empty-state">No books match the current filters.</div>'; return; }
   grid.innerHTML = visible.map((book) => {
-    const index = books.indexOf(book) + 1;
     const isMassa = book.title === 'MASSA';
     const title = escapeHtml(book.title || 'Untitled');
     const series = escapeHtml(book.series || '');
@@ -48,7 +47,6 @@ function render(){
     const detailUrl = `book.html?id=${encodeURIComponent(book.id)}`;
     return `<article class="book-card ${isMassa ? 'massa' : ''}" data-title="${title}">
       <a class="card-main-link" href="${detailUrl}" aria-label="Open ${title}">
-        <div class="card-number">${String(index).padStart(3,'0')}</div>
         <h3 class="card-title">${title}</h3>
         <div class="card-series">${series}</div>
       </a>
