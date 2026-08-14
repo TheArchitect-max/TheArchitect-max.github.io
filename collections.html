@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Browse Rayford Aquirre books by collection and catalog category." />
+  <meta name="theme-color" content="#10110f" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="author" content="Rayford Aquirre" />
+  <link rel="canonical" href="https://thearchitect-max.github.io/collections.html" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <title>Collections — Rayford Aquirre</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Libre+Caslon+Display&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="library.css" />
+  <link rel="stylesheet" href="collections.css" />
+</head>
+<body>
+  <a class="skip-link" href="#collections-main">Skip to content</a>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="Rayford Aquirre home"><span class="brand-mark">RA</span><span class="brand-name">Rayford Aquirre</span></a>
+    <nav aria-label="Primary">
+      <a href="index.html#books">Books</a>
+      <a href="series.html">Series</a>
+      <a href="collections.html" aria-current="page">Collections</a>
+      <a href="index.html#about">About</a>
+      <a class="nav-cta" href="index.html#books">All 118 ebooks</a>
+    </nav>
+  </header>
+
+  <main id="collections-main">
+    <section class="collections-hero">
+      <p class="eyebrow">COLLECTIONS</p>
+      <h1>Browse the catalog by reading area.</h1>
+      <div class="collections-intro">
+        <p>The collections below are generated from the catalog’s current category metadata. They provide a second path into the library alongside title search and series order.</p>
+        <dl class="collection-stats">
+          <div><dt id="collectionCount">—</dt><dd>collections</dd></div>
+          <div><dt id="verifiedCount">—</dt><dd>verified records</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <section class="section collections-library">
+      <div class="collections-tools">
+        <label class="search-box collections-search"><span class="sr-only">Search collections</span><input id="collectionSearch" type="search" placeholder="Search a collection or title…" autocomplete="off" /></label>
+        <span id="collectionResultCount" class="collection-result-count"></span>
+      </div>
+      <div id="collectionsGrid" class="collections-grid" aria-live="polite" aria-busy="true"></div>
+    </section>
+  </main>
+
+  <footer><div><strong>Rayford Aquirre</strong><span>Official author catalog</span></div><div><span id="year"></span> · Independent publishing</div></footer>
+  <script src="collections.js" defer></script>
+</body>
+</html>
