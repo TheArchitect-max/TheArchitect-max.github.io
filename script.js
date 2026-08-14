@@ -10,7 +10,7 @@ let activeCategory = 'All';
 
 function normalize(v=''){ return v.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 function escapeHtml(value='') {
-  return value.replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
 }
 function sortedBooks(list){
   const mode = sortSelect.value;
@@ -40,16 +40,17 @@ function render(){
     const title = escapeHtml(book.title || 'Untitled');
     const series = escapeHtml(book.series || '');
     const category = escapeHtml(book.category || 'Book');
-    const url = book.url && book.url.startsWith('http') ? book.url : '';
+    const external = book.url && book.url.startsWith('http') ? book.url : '';
+    const detailUrl = `book.html?id=${encodeURIComponent(book.id)}`;
     return `<article class="book-card ${isMassa ? 'massa' : ''}" data-title="${title}">
-      <div>
+      <a class="card-main-link" href="${detailUrl}" aria-label="Open ${title}">
         <div class="card-number">${String(index).padStart(3,'0')}</div>
         <h3 class="card-title">${title}</h3>
         <div class="card-series">${series}</div>
-      </div>
+      </a>
       <div class="card-bottom">
         <span class="card-category">${category}</span>
-        ${url ? `<a class="card-link" href="${url}" target="_blank" rel="noopener noreferrer">View book ↗</a>` : '<span class="card-link card-link-muted">New release</span>'}
+        <div class="card-actions"><a class="card-link" href="${detailUrl}">Details</a>${external ? `<a class="card-link secondary" href="${escapeHtml(external)}" target="_blank" rel="noopener noreferrer">D2D ↗</a>` : ''}</div>
       </div>
     </article>`;
   }).join('');
@@ -66,16 +67,14 @@ function buildFilters(){
 }
 
 Promise.all([
-  'data/books-1.json',
-  'data/books-2.json',
-  'data/books-3.json',
-  'data/books-4.json'
-].map(path => fetch(path).then(r => {
-  if(!r.ok) throw new Error(`Catalog load failed: ${path}`);
-  return r.json();
-})))
-  .then(parts => {
-    books = parts.flat();
+  Promise.all(['data/books-1.json','data/books-2.json','data/books-3.json','data/books-4.json'].map(path => fetch(path).then(r => {
+    if(!r.ok) throw new Error(`Catalog load failed: ${path}`);
+    return r.json();
+  }))),
+  fetch('data/series-map.json').then(r => r.ok ? r.json() : {})
+])
+  .then(([parts, seriesMap]) => {
+    books = parts.flat().map(book => ({...book, series: book.series || seriesMap[book.id] || ''}));
     buildFilters();
     render();
   })
@@ -88,22 +87,15 @@ searchInput.addEventListener('input', render);
 sortSelect.addEventListener('change', render);
 seriesOnly.addEventListener('change', render);
 clearSearch.addEventListener('click', () => {
-  searchInput.value='';
-  activeCategory='All';
-  sortSelect.value='catalog';
-  seriesOnly.checked=false;
+  searchInput.value=''; activeCategory='All'; sortSelect.value='catalog'; seriesOnly.checked=false;
   [...filters.children].forEach(el => el.classList.toggle('active', el.dataset.category==='All'));
   render();
 });
 document.querySelector('[data-focus-massa]').addEventListener('click', () => {
   setTimeout(()=>{
-    searchInput.value='MASSA';
-    activeCategory='All';
-    seriesOnly.checked=false;
-    sortSelect.value='catalog';
+    searchInput.value='MASSA'; activeCategory='All'; seriesOnly.checked=false; sortSelect.value='catalog';
     [...filters.children].forEach(el => el.classList.toggle('active', el.dataset.category==='All'));
-    render();
-    searchInput.focus();
+    render(); searchInput.focus();
   },350);
 });
 document.getElementById('year').textContent = new Date().getFullYear();
