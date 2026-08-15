@@ -1,14 +1,12 @@
 (() => {
   const AUTHOR = 'Rayford Aquirre';
-  const CACHE_KEY = 'ra-book-media-v5';
+  const CACHE_KEY = 'ra-book-metadata-v6';
   const CACHE_TTL = 24 * 60 * 60 * 1000;
   const countries = ['us', 'nl', 'gb'];
-  const LOCAL_COVERS = {
-    'massa-2026': 'assets/massa-cover.jpg'
-  };
-  let catalogPromise = null;
+  let appleCatalogPromise = null;
   let retailManifestPromise = null;
-  const titlePromises = new Map();
+  let d2dManifestPromise = null;
+  const metadataPromises = new Map();
 
   function normalize(value = '') {
     return String(value)
@@ -47,8 +45,15 @@
   }
 
   function authorMatches(item) {
-    const artist = normalize(item?.artistName || '');
-    return artist.includes(normalize(AUTHOR));
+    return normalize(item?.artistName || '').includes(normalize(AUTHOR));
+  }
+
+  async function loadD2DManifest() {
+    if (d2dManifestPromise) return d2dManifestPromise;
+    d2dManifestPromise = fetch('data/d2d-media.json', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : {})
+      .catch(() => ({}));
+    return d2dManifestPromise;
   }
 
   async function loadRetailManifest() {
@@ -59,18 +64,33 @@
     return retailManifestPromise;
   }
 
-  function manifestItem(book, manifest) {
-    const entry = manifest?.[String(book?.id || '')];
-    if (!entry) return null;
-    const cover = entry.cover || (entry.bnId ? `https://prodimage.images-bn.com/pimages/${entry.bnId}_p0_v1_s1200x1800.jpg` : '');
+  function canonicalCover(book, d2dManifest) {
+    const entry = d2dManifest?.[String(book?.id || '')];
+    if (!entry?.cover) return null;
     return {
-      _provider: 'retail-manifest',
-      _retailProvider: entry.coverProvider || entry.retailLabel || 'Verified retailer',
+      _provider: 'd2d-canonical',
+      _coverProvider: 'Draft2Digital',
+      _coverCheckedAt: entry.checkedAt || '',
+      trackId: String(book?.id || ''),
+      trackName: book?.title || '',
+      artistName: AUTHOR,
+      artworkUrl100: entry.cover,
+      description: entry.description || '',
+      trackViewUrl: entry.retailUrl || '',
+      isbn: entry.isbn || ''
+    };
+  }
+
+  function retailMetadata(book, retailManifest) {
+    const entry = retailManifest?.[String(book?.id || '')];
+    if (!entry) return null;
+    return {
+      _provider: 'retail-metadata',
+      _retailProvider: entry.retailLabel || entry.coverProvider || 'Retailer',
       _verifiedStores: entry.verifiedStores || [],
       trackId: String(book?.id || ''),
       trackName: book?.title || '',
       artistName: AUTHOR,
-      artworkUrl100: cover,
       trackViewUrl: entry.retailUrl || '',
       description: entry.description || '',
       isbn: entry.isbn || '',
@@ -78,15 +98,17 @@
     };
   }
 
-  function withLocalCover(book, item) {
-    const local = LOCAL_COVERS[String(book?.id || '')];
-    if(!local) return item;
+  function mergeMetadata(primary, secondary) {
+    if (!primary && !secondary) return null;
     return {
-      ...(item || {}),
-      _localArtwork: local,
-      _provider: item?._provider || 'local',
-      trackName: item?.trackName || book?.title || '',
-      artistName: item?.artistName || AUTHOR
+      ...(secondary || {}),
+      ...(primary || {}),
+      artworkUrl100: primary?.artworkUrl100 || '',
+      _provider: primary?._provider || secondary?._provider || '',
+      _coverProvider: primary?._coverProvider || '',
+      trackViewUrl: primary?.trackViewUrl || secondary?.trackViewUrl || '',
+      description: primary?.description || secondary?.description || '',
+      isbn: primary?.isbn || secondary?.isbn || ''
     };
   }
 
@@ -102,9 +124,9 @@
 
   function jsonp(url, timeout = 9000) {
     return new Promise((resolve, reject) => {
-      const callback = `__raMedia_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+      const callback = `__raMeta_${Date.now()}_${Math.random().toString(36).slice(2)}`;
       const script = document.createElement('script');
-      const timer = setTimeout(() => cleanup(new Error('Book media request timed out')), timeout);
+      const timer = setTimeout(() => cleanup(new Error('Book metadata request timed out')), timeout);
       function cleanup(error, data) {
         clearTimeout(timer);
         try { delete window[callback]; } catch (_) { window[callback] = undefined; }
@@ -112,7 +134,7 @@
         error ? reject(error) : resolve(data);
       }
       window[callback] = data => cleanup(null, data);
-      script.onerror = () => cleanup(new Error('Book media request failed'));
+      script.onerror = () => cleanup(new Error('Book metadata request failed'));
       script.src = `${url}${url.includes('?') ? '&' : '?'}callback=${encodeURIComponent(callback)}`;
       document.head.appendChild(script);
     });
@@ -127,7 +149,9 @@
       country
     });
     const data = await jsonp(`https://itunes.apple.com/search?${params}`);
-    return Array.isArray(data?.results) ? data.results.filter(authorMatches).map(item=>({...item,_provider:'apple'})) : [];
+    return Array.isArray(data?.results)
+      ? data.results.filter(authorMatches).map(item => ({ ...item, _provider: 'apple-metadata', artworkUrl100: '' }))
+      : [];
   }
 
   function readCache() {
@@ -143,8 +167,8 @@
   }
 
   async function loadCatalog() {
-    if (catalogPromise) return catalogPromise;
-    catalogPromise = (async () => {
+    if (appleCatalogPromise) return appleCatalogPromise;
+    appleCatalogPromise = (async () => {
       const cached = readCache();
       if (cached) return cached;
       const batches = await Promise.all(countries.map(country => authorSearch(country).catch(() => [])));
@@ -152,7 +176,7 @@
       if (results.length) writeCache(results);
       return results;
     })();
-    return catalogPromise;
+    return appleCatalogPromise;
   }
 
   function bestMatch(book, results = []) {
@@ -177,20 +201,19 @@
       projection: 'full'
     });
     const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params}`);
-    if(!response.ok) return null;
+    if (!response.ok) return null;
     const data = await response.json();
     const results = Array.isArray(data?.items) ? data.items.map(item => {
       const v = item?.volumeInfo || {};
-      const images = v.imageLinks || {};
       return {
-        _provider: 'google',
+        _provider: 'google-metadata',
         trackId: item?.id || '',
         trackName: v.title || '',
         artistName: Array.isArray(v.authors) ? v.authors.join(', ') : '',
         description: v.description || '',
         releaseDate: v.publishedDate || '',
         trackViewUrl: v.infoLink || '',
-        artworkUrl100: images.extraLarge || images.large || images.medium || images.small || images.thumbnail || images.smallThumbnail || ''
+        artworkUrl100: ''
       };
     }) : [];
     return bestMatch(book, results);
@@ -204,29 +227,21 @@
       country
     });
     const data = await jsonp(`https://itunes.apple.com/search?${params}`);
-    const results = Array.isArray(data?.results) ? data.results.map(item=>({...item,_provider:'apple'})) : [];
+    const results = Array.isArray(data?.results)
+      ? data.results.map(item => ({ ...item, _provider: 'apple-metadata', artworkUrl100: '' }))
+      : [];
     return bestMatch(book, results);
   }
 
-  async function find(book, allowFocusedSearch = true) {
-    const manifest = await loadRetailManifest();
-    const curated = manifestItem(book, manifest);
-    if (curated?.artworkUrl100 || curated?.trackViewUrl || LOCAL_COVERS[String(book?.id || '')]) {
-      return withLocalCover(book, curated);
-    }
-
-    if (!allowFocusedSearch) {
-      return withLocalCover(book, null);
-    }
-
+  async function externalMetadata(book) {
     const key = normalize(book?.title || '');
-    if (!key) return withLocalCover(book, null);
-    if (!titlePromises.has(key)) {
-      titlePromises.set(key, (async () => {
+    if (!key) return null;
+    if (!metadataPromises.has(key)) {
+      metadataPromises.set(key, (async () => {
         const google = await titleSearchGoogle(book).catch(() => null);
         if (google) return google;
-        const results = await loadCatalog().catch(() => []);
-        const fromAppleCatalog = bestMatch(book, results);
+        const catalog = await loadCatalog().catch(() => []);
+        const fromAppleCatalog = bestMatch(book, catalog);
         if (fromAppleCatalog) return fromAppleCatalog;
         for (const country of countries) {
           const match = await titleSearchApple(book, country).catch(() => null);
@@ -235,52 +250,54 @@
         return null;
       })());
     }
-    const focused = await titlePromises.get(key);
-    return withLocalCover(book, focused);
+    return metadataPromises.get(key);
   }
 
-  function artworkUrl(item, variant = 'thumb') {
-    if(item?._localArtwork) return item._localArtwork;
-    let source = item?.artworkUrl100 || item?.artworkUrl60 || '';
-    if (!source) return '';
-    source = source.replace(/^http:/i,'https:');
-    if(item?._provider === 'google'){
-      try {
-        const url = new URL(source);
-        url.searchParams.set('zoom', variant === 'detail' ? '3' : '2');
-        return url.toString();
-      } catch (_) { return source; }
-    }
-    if(item?._provider === 'retail-manifest') return source;
-    const box = variant === 'detail' ? '1400x2100bb' : '600x900bb';
-    return source
-      .replace(/\d+x\d+bb(?=\.(?:jpg|png|webp))/i, box)
-      .replace(/\d+x\d+bb(?=\/)/i, box);
+  async function find(book, allowFocusedSearch = true) {
+    const [d2dManifest, retailManifest] = await Promise.all([loadD2DManifest(), loadRetailManifest()]);
+    const cover = canonicalCover(book, d2dManifest);
+    const retail = retailMetadata(book, retailManifest);
+
+    if (!allowFocusedSearch) return mergeMetadata(cover, retail);
+
+    const external = await externalMetadata(book).catch(() => null);
+    const metadata = retail || external;
+    return mergeMetadata(cover, metadata);
+  }
+
+  function artworkUrl(item) {
+    return item?.artworkUrl100 || '';
   }
 
   function description(item) {
     return String(item?.description || '')
       .replace(/<br\s*\/?>/gi, '\n')
-      .replace(/<[^>]+>/g,'')
+      .replace(/<[^>]+>/g, '')
       .trim();
   }
 
   function sourceLabel(item) {
-    if(item?._localArtwork) return 'Local original cover';
-    if(item?._provider === 'retail-manifest') return item._retailProvider || 'Verified retailer';
-    if(item?._provider === 'google') return 'Google Books';
-    if(item?._provider === 'apple') return 'Apple Books';
+    if (item?._coverProvider === 'Draft2Digital') return 'Draft2Digital';
+    return '';
+  }
+
+  function metadataSourceLabel(item) {
+    if (item?._retailProvider) return item._retailProvider;
+    if (item?._provider === 'google-metadata') return 'Google Books';
+    if (item?._provider === 'apple-metadata') return 'Apple Books';
     return '';
   }
 
   window.RABookMedia = {
     loadCatalog,
+    loadD2DManifest,
     loadRetailManifest,
     find,
     bestMatch,
     artworkUrl,
     description,
     sourceLabel,
+    metadataSourceLabel,
     normalize
   };
 })();
