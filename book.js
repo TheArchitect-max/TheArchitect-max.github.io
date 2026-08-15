@@ -43,7 +43,8 @@ function updateMetadata(book, meta={}, media=null) {
 function coverMarkup(book, media=null) {
   const src = window.RABookMedia?.artworkUrl(media, 'detail') || '';
   if(src){
-    return `<div class="detail-cover-frame"><img src="${escapeHtml(src)}" alt="Cover of ${escapeHtml(book.title)} by Rayford Aquirre" decoding="async" /></div>`;
+    const source = window.RABookMedia?.sourceLabel(media) || '';
+    return `<div class="detail-cover-frame"><img src="${escapeHtml(src)}" alt="Cover of ${escapeHtml(book.title)} by Rayford Aquirre" decoding="async" />${source ? `<span class="cover-source-label">Cover source: ${escapeHtml(source)}</span>` : ''}</div>`;
   }
   return `<div class="detail-cover-frame">${identityMarkup(book)}</div>`;
 }
@@ -62,7 +63,7 @@ function renderFacts(book, meta={}, media=null) {
     ['Catalog ID',book.id],
     ['Category',meta.genre || book.category || 'Book'],
     ['Language',language],
-    ['ISBN',meta.isbn],
+    ['ISBN',meta.isbn || media?.isbn],
     ['Release date',meta.releaseDate || (media?.releaseDate ? String(media.releaseDate).slice(0,10) : '')],
     ['Pages',meta.pages]
   ].filter(([,value]) => value !== undefined && value !== null && value !== '');
@@ -70,7 +71,9 @@ function renderFacts(book, meta={}, media=null) {
 }
 function renderSources(meta={}, media=null) {
   const links = [];
-  if(media?.trackViewUrl) links.push({label:'Apple Books',url:media.trackViewUrl});
+  if(media?.trackViewUrl) {
+    links.push({label:window.RABookMedia?.sourceLabel(media) || 'Retail listing',url:media.trackViewUrl});
+  }
   if(Array.isArray(meta.sources)){
     meta.sources.forEach(src=>{
       if(!src?.url || links.some(link=>link.url===src.url)) return;
@@ -102,9 +105,9 @@ Promise.all([
   const retailUrl = media?.trackViewUrl || '';
   const d2dUrl = book.url && book.url.startsWith('http') ? book.url : '';
   const primaryAction = retailUrl
-    ? `<a class="button button-primary" href="${escapeHtml(retailUrl)}" target="_blank" rel="noopener noreferrer">View book ↗</a>`
+    ? `<a class="button button-primary" href="${escapeHtml(retailUrl)}" target="_blank" rel="noopener noreferrer">View at ${escapeHtml(window.RABookMedia?.sourceLabel(media) || 'retailer')} ↗</a>`
     : (d2dUrl ? `<a class="button button-primary" href="${escapeHtml(d2dUrl)}" target="_blank" rel="noopener noreferrer">View book ↗</a>` : '');
-  const fullDescription = Boolean(window.RABookMedia?.description(media));
+  const fullDescription = Boolean(descriptionFor(book, meta, media) && descriptionFor(book, meta, media) !== 'A verified full description is not yet available for this catalog record.');
   detail.innerHTML = `
     <div class="detail-identity-column">${coverMarkup(book, media)}</div>
     <div class="detail-copy">
