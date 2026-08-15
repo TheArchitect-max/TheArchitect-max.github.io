@@ -4,6 +4,7 @@ const resultCount = document.getElementById('collectionResultCount');
 const collectionCount = document.getElementById('collectionCount');
 const verifiedCount = document.getElementById('verifiedCount');
 document.getElementById('year').textContent = new Date().getFullYear();
+let generation = 0;
 
 function escapeHtml(value='') {
   return String(value).replace(/[&<>'\"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','\"':'&quot;'}[ch]));
@@ -30,7 +31,24 @@ function groupCollections(books, verified) {
       return b.items.length-a.items.length || a.name.localeCompare(b.name);
     });
 }
+async function enrichMiniCovers(items, renderId){
+  if(!window.RABookMedia) return;
+  await window.RABookMedia.loadCatalog().catch(()=>[]);
+  const queue=[...items];
+  async function worker(){
+    while(queue.length && renderId===generation){
+      const book=queue.shift();
+      const media=await window.RABookMedia.find(book,true).catch(()=>null);
+      if(!media || renderId!==generation) continue;
+      const slot=grid.querySelector(`[data-mini-cover="${CSS.escape(String(book.id))}"]`);
+      const src=window.RABookMedia.artworkUrl(media,'thumb');
+      if(slot&&src) slot.innerHTML=`<img src="${escapeHtml(src)}" alt="Cover of ${escapeHtml(book.title)}" loading="lazy" decoding="async" />`;
+    }
+  }
+  await Promise.all(Array.from({length:3},()=>worker()));
+}
 function render(groups) {
+  const renderId=++generation;
   const q = normalize(search.value.trim());
   const visible = groups.filter(group => {
     if(!q) return true;
@@ -49,9 +67,10 @@ function render(groups) {
         </div>
       </div>
       <div class="collection-books">
-        ${group.items.map(book=>`<a class="collection-book" href="book.html?id=${encodeURIComponent(book.id)}"><span>${escapeHtml(book.title)}</span>${book.verified?'<small>verified</small>':''}<b>↗</b></a>`).join('')}
+        ${group.items.map(book=>`<a class="collection-book has-mini-cover" href="book.html?id=${encodeURIComponent(book.id)}"><span class="mini-cover" data-mini-cover="${escapeHtml(book.id)}"><span class="mini-cover-placeholder">RA</span></span><span>${escapeHtml(book.title)}</span>${book.verified?'<small>verified</small>':''}<b>↗</b></a>`).join('')}
       </div>
     </section>`).join('');
+  enrichMiniCovers(visible.flatMap(group=>group.items),renderId);
 }
 
 Promise.all([
