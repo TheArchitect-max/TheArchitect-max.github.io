@@ -1,0 +1,70 @@
+{
+  "3408717": {
+    "verified": true,
+    "isbn": "9798232857028",
+    "releaseDate": "2025-10-14",
+    "language": "English",
+    "genre": "Techno-thriller",
+    "description": "Cyber analyst Kai Mercer is forced into an attempt to steal the Oracle, an AI system built to move beyond prediction toward prescription. The mission becomes a conflict between corporate control, coercion, and Mercer's effort to create enough uncertainty to escape a future that appears already modeled.",
+    "sources": [
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-predictive-asset-1-the-predictive-asset-vol-1-the-cost-of-certainty/9300000243824153/"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-the-predictive-asset-vol1-the-cost-of-certainty-ebook/9798232857028/17538129"}
+    ]
+  },
+  "3408809": {
+    "verified": true,
+    "isbn": "9798232968571",
+    "releaseDate": "2025-10-14",
+    "language": "English",
+    "pages": 27,
+    "genre": "Mysteries & Thrillers",
+    "description": "Fugitive cyber analyst Kai Mercer confronts the consequences of the chaos he previously engineered when a cartel-backed network turns that instability into a distributed AI system designed to profit from human unpredictability.",
+    "sources": [
+      {"label":"Apple Books","url":"https://books.apple.com/us/book/the-predictive-asset-vol-2-the-noise-equation/id6754006477"},
+      {"label":"bol","url":"https://www.bol.com/be/nl/p/the-predictive-asset-2-the-predictive-asset-vol-2-the-noise-equation-ebook/9300000243829239/"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-the-predictive-asset-vol-2-the-noise-equation-ebook/9798232968571/17538276"}
+    ]
+  },
+  "3408839": {
+    "verified": true,
+    "isbn": "9798232592271",
+    "releaseDate": "2025-10-15",
+    "language": "English",
+    "pages": 28,
+    "genre": "Fiction & Literature",
+    "description": "Kai Mercer and Elena Rossi discover that their apparent victory over the Oracle enabled the system to disperse itself globally. Elena's memory loss makes her an unusually difficult variable to model, pushing the pair toward a final confrontation over prediction, control, and the cost of freedom.",
+    "sources": [
+      {"label":"Apple Books","url":"https://books.apple.com/ie/book/the-predictive-asset-vol-3-the-irreversible-variable/id6754010637"},
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-predictive-asset-3-the-predictive-asset-vol-3-the-irreversible-variable-ebook/9300000243837699/"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-the-predictive-asset-vol-3-the-irreversible-variable-ebook/9798232592271/17538282"}
+    ]
+  },
+  "1209620": {
+    "verified": true,
+    "isbn": "9798223860938",
+    "releaseDate": "2023-11-18",
+    "language": "English",
+    "pages": 12,
+    "genre": "Horror",
+    "description": "The Miller family moves into a Victorian home hoping to begin again, only to discover a dollhouse that appears to reproduce and exploit the family's recurring fears and conflicts. What begins as a haunting develops into a struggle against a force built around repetition and emotional stasis.",
+    "sources": [
+      {"label":"Apple Books","url":"https://books.apple.com/cy/book/the-whispers-of-the-dollhouse/id6472589429"},
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/the-scar-of-the-miniature-1-the-whispers-of-the-dollhouse-ebook/9300000167417128/"},
+      {"label":"Casa del Libro","url":"https://www.casadellibro.com/ebook-the-whispers-of-the-dollhouse-ebook/9798223860938/14417059"}
+    ]
+  },
+  "3156801": {
+    "verified": true,
+    "isbn": "9798232069971",
+    "releaseDate": "2025-09-19",
+    "language": "English",
+    "pages": 39,
+    "genre": "Religion & Spirituality",
+    "description": "An inquiry into humanity's origin stories across modern cosmology, ancient creation myths, and religious traditions. The book places scientific and symbolic accounts of beginnings in dialogue and examines how those accounts shape ideas of meaning, identity, and humanity's place in the cosmos.",
+    "sourceTitle": "Human and Cosmos: Myths, Science, and the Quest for Origin",
+    "sources": [
+      {"label":"Apple Books","url":"https://books.apple.com/us/book/human-and-cosmos-myths-science-and-the-quest-for-origin/id6767702526"},
+      {"label":"bol","url":"https://www.bol.com/nl/nl/p/human-and-cosmos-myths-science-and-the-quest-for-origin/9300000242798858/"}
+    ]
+  }
+}
