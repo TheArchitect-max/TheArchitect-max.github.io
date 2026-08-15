@@ -1,0 +1,31 @@
+name: Catalog integrity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'data/books-*.json'
+      - 'data/d2d-media.json'
+      - 'assets/covers/**'
+      - 'scripts/validate-d2d-media.mjs'
+      - '.github/workflows/catalog-integrity.yml'
+  pull_request:
+    paths:
+      - 'data/books-*.json'
+      - 'data/d2d-media.json'
+      - 'assets/covers/**'
+      - 'scripts/validate-d2d-media.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-d2d-covers:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate canonical D2D media
+        run: node scripts/validate-d2d-media.mjs
