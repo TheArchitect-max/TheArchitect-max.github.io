@@ -1,12 +1,13 @@
 (() => {
   const AUTHOR = 'Rayford Aquirre';
-  const CACHE_KEY = 'ra-apple-book-media-v4';
+  const CACHE_KEY = 'ra-book-media-v5';
   const CACHE_TTL = 24 * 60 * 60 * 1000;
   const countries = ['us', 'nl', 'gb'];
   const LOCAL_COVERS = {
     'massa-2026': 'assets/massa-cover.jpg'
   };
   let catalogPromise = null;
+  let retailManifestPromise = null;
   const titlePromises = new Map();
 
   function normalize(value = '') {
@@ -50,12 +51,40 @@
     return artist.includes(normalize(AUTHOR));
   }
 
+  async function loadRetailManifest() {
+    if (retailManifestPromise) return retailManifestPromise;
+    retailManifestPromise = fetch('data/retail-media.json', { cache: 'no-store' })
+      .then(r => r.ok ? r.json() : {})
+      .catch(() => ({}));
+    return retailManifestPromise;
+  }
+
+  function manifestItem(book, manifest) {
+    const entry = manifest?.[String(book?.id || '')];
+    if (!entry) return null;
+    const cover = entry.cover || (entry.bnId ? `https://prodimage.images-bn.com/pimages/${entry.bnId}_p0_v1_s1200x1800.jpg` : '');
+    return {
+      _provider: 'retail-manifest',
+      _retailProvider: entry.coverProvider || entry.retailLabel || 'Verified retailer',
+      _verifiedStores: entry.verifiedStores || [],
+      trackId: String(book?.id || ''),
+      trackName: book?.title || '',
+      artistName: AUTHOR,
+      artworkUrl100: cover,
+      trackViewUrl: entry.retailUrl || '',
+      description: entry.description || '',
+      isbn: entry.isbn || '',
+      checkedAt: entry.checkedAt || ''
+    };
+  }
+
   function withLocalCover(book, item) {
     const local = LOCAL_COVERS[String(book?.id || '')];
     if(!local) return item;
     return {
       ...(item || {}),
       _localArtwork: local,
+      _provider: item?._provider || 'local',
       trackName: item?.trackName || book?.title || '',
       artistName: item?.artistName || AUTHOR
     };
@@ -140,6 +169,33 @@
     return bestScore >= 0.68 ? best : null;
   }
 
+  async function titleSearchGoogle(book) {
+    const params = new URLSearchParams({
+      q: `intitle:${book.title} inauthor:${AUTHOR}`,
+      maxResults: '10',
+      printType: 'books',
+      projection: 'full'
+    });
+    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params}`);
+    if(!response.ok) return null;
+    const data = await response.json();
+    const results = Array.isArray(data?.items) ? data.items.map(item => {
+      const v = item?.volumeInfo || {};
+      const images = v.imageLinks || {};
+      return {
+        _provider: 'google',
+        trackId: item?.id || '',
+        trackName: v.title || '',
+        artistName: Array.isArray(v.authors) ? v.authors.join(', ') : '',
+        description: v.description || '',
+        releaseDate: v.publishedDate || '',
+        trackViewUrl: v.infoLink || '',
+        artworkUrl100: images.extraLarge || images.large || images.medium || images.small || images.thumbnail || images.smallThumbnail || ''
+      };
+    }) : [];
+    return bestMatch(book, results);
+  }
+
   async function titleSearchApple(book, country) {
     const params = new URLSearchParams({
       term: `${book.title} ${AUTHOR}`,
@@ -152,48 +208,31 @@
     return bestMatch(book, results);
   }
 
-  function googleItem(item) {
-    const v = item?.volumeInfo || {};
-    const images = v.imageLinks || {};
-    return {
-      _provider: 'google',
-      trackId: item?.id || '',
-      trackName: v.title || '',
-      artistName: Array.isArray(v.authors) ? v.authors.join(', ') : '',
-      description: v.description || '',
-      releaseDate: v.publishedDate || '',
-      trackViewUrl: v.infoLink || '',
-      artworkUrl100: images.extraLarge || images.large || images.medium || images.small || images.thumbnail || images.smallThumbnail || ''
-    };
-  }
-
-  async function titleSearchGoogle(book) {
-    const params = new URLSearchParams({
-      q: `intitle:${book.title} inauthor:${AUTHOR}`,
-      maxResults: '10',
-      printType: 'books',
-      projection: 'full'
-    });
-    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params}`);
-    if(!response.ok) return null;
-    const data = await response.json();
-    const results = Array.isArray(data?.items) ? data.items.map(googleItem) : [];
-    return bestMatch(book, results);
-  }
-
   async function find(book, allowFocusedSearch = true) {
-    const results = await loadCatalog().catch(() => []);
-    const fromCatalog = bestMatch(book, results);
-    if (fromCatalog || !allowFocusedSearch) return withLocalCover(book, fromCatalog);
+    const manifest = await loadRetailManifest();
+    const curated = manifestItem(book, manifest);
+    if (curated?.artworkUrl100 || curated?.trackViewUrl || LOCAL_COVERS[String(book?.id || '')]) {
+      return withLocalCover(book, curated);
+    }
+
+    if (!allowFocusedSearch) {
+      return withLocalCover(book, null);
+    }
+
     const key = normalize(book?.title || '');
     if (!key) return withLocalCover(book, null);
     if (!titlePromises.has(key)) {
       titlePromises.set(key, (async () => {
+        const google = await titleSearchGoogle(book).catch(() => null);
+        if (google) return google;
+        const results = await loadCatalog().catch(() => []);
+        const fromAppleCatalog = bestMatch(book, results);
+        if (fromAppleCatalog) return fromAppleCatalog;
         for (const country of countries) {
           const match = await titleSearchApple(book, country).catch(() => null);
           if (match) return match;
         }
-        return titleSearchGoogle(book).catch(() => null);
+        return null;
       })());
     }
     const focused = await titlePromises.get(key);
@@ -212,6 +251,7 @@
         return url.toString();
       } catch (_) { return source; }
     }
+    if(item?._provider === 'retail-manifest') return source;
     const box = variant === 'detail' ? '1400x2100bb' : '600x900bb';
     return source
       .replace(/\d+x\d+bb(?=\.(?:jpg|png|webp))/i, box)
@@ -225,12 +265,22 @@
       .trim();
   }
 
+  function sourceLabel(item) {
+    if(item?._localArtwork) return 'Local original cover';
+    if(item?._provider === 'retail-manifest') return item._retailProvider || 'Verified retailer';
+    if(item?._provider === 'google') return 'Google Books';
+    if(item?._provider === 'apple') return 'Apple Books';
+    return '';
+  }
+
   window.RABookMedia = {
     loadCatalog,
+    loadRetailManifest,
     find,
     bestMatch,
     artworkUrl,
     description,
+    sourceLabel,
     normalize
   };
 })();
