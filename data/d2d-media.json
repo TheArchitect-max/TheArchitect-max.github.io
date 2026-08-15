@@ -3,5 +3,10 @@
     "cover": "assets/massa-cover.jpg",
     "source": "Draft2Digital canonical cover",
     "checkedAt": "2026-08-15"
+  },
+  "4384950": {
+    "cover": "assets/covers/reachable-by-reality.webp",
+    "source": "Draft2Digital-synced canonical cover",
+    "checkedAt": "2026-08-15"
   }
 }
