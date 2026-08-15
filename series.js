@@ -33,19 +33,19 @@ function groupSeries(books) {
 }
 async function enrichMiniCovers(items, renderId){
   if(!window.RABookMedia) return;
-  await window.RABookMedia.loadCatalog().catch(()=>[]);
+  await window.RABookMedia.loadD2DManifest().catch(()=>({}));
   const queue=[...items];
   async function worker(){
     while(queue.length && renderId===generation){
       const book=queue.shift();
-      const media=await window.RABookMedia.find(book,true).catch(()=>null);
+      const media=await window.RABookMedia.find(book,false).catch(()=>null);
       if(!media || renderId!==generation) continue;
       const slot=grid.querySelector(`[data-mini-cover="${CSS.escape(String(book.id))}"]`);
       const src=window.RABookMedia.artworkUrl(media,'thumb');
       if(slot&&src) slot.innerHTML=`<img src="${escapeHtml(src)}" alt="Cover of ${escapeHtml(book.title)}" loading="lazy" decoding="async" />`;
     }
   }
-  await Promise.all(Array.from({length:3},()=>worker()));
+  await Promise.all(Array.from({length:4},()=>worker()));
 }
 function render(groups) {
   const renderId=++generation;
@@ -71,7 +71,7 @@ function render(groups) {
           <li>
             <a class="has-mini-cover" href="book.html?id=${encodeURIComponent(book.id)}">
               <span class="volume-number">${seriesNumber(book.series) === 999 ? '•' : String(seriesNumber(book.series)).padStart(2,'0')}</span>
-              <span class="mini-cover" data-mini-cover="${escapeHtml(book.id)}"><span class="mini-cover-placeholder">RA</span></span>
+              <span class="mini-cover" data-mini-cover="${escapeHtml(book.id)}"><span class="mini-cover-placeholder">D2D</span></span>
               <span class="volume-title">${escapeHtml(book.title)}</span>
               <span class="volume-arrow">↗</span>
             </a>
