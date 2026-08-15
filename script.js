@@ -26,18 +26,29 @@ function sortedBooks(list){
 }
 function coverPlaceholder(book){
   const title = escapeHtml(book.title || 'Book');
-  return `<div class="card-cover-frame" data-cover-id="${escapeHtml(book.id)}" aria-label="Draft2Digital cover for ${title}">
-    <div class="cover-loading" aria-hidden="true"><span>D2D</span></div>
+  return `<div class="card-cover-frame" data-cover-id="${escapeHtml(book.id)}" aria-label="Book cover for ${title}">
+    <div class="cover-loading" aria-hidden="true"><span>RA</span></div>
   </div>`;
 }
-function applyCover(book, media, generation){
+function descriptionForCard(book, media=null){
+  const mediaDescription = window.RABookMedia?.description(media) || '';
+  return book.description || mediaDescription || 'Book description is being synchronized with the public catalog.';
+}
+function applyMedia(book, media, generation){
   if(generation !== renderGeneration || !media) return;
   const frame = grid.querySelector(`[data-cover-id="${CSS.escape(String(book.id))}"]`);
-  if(!frame) return;
-  const src = window.RABookMedia?.artworkUrl(media, 'thumb');
-  if(!src) return;
-  frame.innerHTML = `<img src="${escapeHtml(src)}" alt="Cover of ${escapeHtml(book.title)} by Rayford Aquirre" loading="lazy" decoding="async" />`;
-  frame.classList.add('has-cover');
+  if(frame){
+    const src = window.RABookMedia?.artworkUrl(media, 'thumb');
+    if(src){
+      frame.innerHTML = `<img src="${escapeHtml(src)}" alt="Cover of ${escapeHtml(book.title)} by Rayford Aquirre" loading="lazy" decoding="async" />`;
+      frame.classList.add('has-cover');
+    }
+  }
+  if(!book.description){
+    const description = window.RABookMedia?.description(media) || '';
+    const node = grid.querySelector(`[data-description-id="${CSS.escape(String(book.id))}"]`);
+    if(node && description) node.textContent = description;
+  }
 }
 async function enrichCovers(visible, generation){
   if(!window.RABookMedia) return;
@@ -52,7 +63,7 @@ async function enrichCovers(visible, generation){
         media=await window.RABookMedia.find(book,false).catch(()=>null);
         mediaCache.set(book.id,media);
       }
-      applyCover(book,media,generation);
+      applyMedia(book,media,generation);
     }
   }
   await Promise.all(Array.from({length:4},()=>worker()));
@@ -65,7 +76,7 @@ function render(){
     const categoryMatch = activeCategory === 'All' ||
       (activeCategory === 'Nederlands' ? book.language === 'Nederlands' : book.category === activeCategory);
     const seriesMatch = !seriesOnly.checked || Boolean(book.series);
-    const haystack = normalize(`${book.title} ${book.series || ''} ${book.category || ''} ${book.language || ''}`);
+    const haystack = normalize(`${book.title} ${book.series || ''} ${book.category || ''} ${book.language || ''} ${book.description || ''}`);
     return categoryMatch && seriesMatch && (!q || haystack.includes(q));
   });
   visible = sortedBooks(visible);
@@ -77,8 +88,8 @@ function render(){
     const title = escapeHtml(book.title || 'Untitled');
     const series = escapeHtml(book.series || '');
     const category = escapeHtml(book.category || 'Book');
+    const description = escapeHtml(descriptionForCard(book));
     const language = book.language === 'Nederlands' ? '<span class="card-language">Nederlands</span>' : '';
-    const external = book.url && book.url.startsWith('http') ? book.url : '';
     const detailUrl = `book.html?id=${encodeURIComponent(book.id)}`;
     return `<article class="book-card" data-title="${title}">
       <a class="card-main-link" href="${detailUrl}" aria-label="Open ${title}">
@@ -86,11 +97,12 @@ function render(){
         <div class="card-copy">
           <h3 class="card-title">${title}</h3>
           <div class="card-series">${series}</div>
+          <p class="card-description" data-description-id="${escapeHtml(book.id)}">${description}</p>
         </div>
       </a>
       <div class="card-bottom">
         <span class="card-category">${category}${language}</span>
-        <div class="card-actions"><a class="card-link" href="${detailUrl}">Details</a>${external ? `<a class="card-link secondary" href="${escapeHtml(external)}" target="_blank" rel="noopener noreferrer">D2D ↗</a>` : ''}</div>
+        <div class="card-actions"><a class="card-link" href="${detailUrl}">Details</a></div>
       </div>
     </article>`;
   }).join('');
@@ -115,10 +127,15 @@ Promise.all([
     return r.json();
   }))),
   fetch('data/series-map.json').then(r => r.ok ? r.json() : {}),
-  fetch('data/language-map.json').then(r => r.ok ? r.json() : {})
+  fetch('data/language-map.json').then(r => r.ok ? r.json() : {}),
+  Promise.all(['data/verified-metadata.json','data/verified-metadata-2.json','data/verified-metadata-3.json'].map(path => fetch(path).then(r => r.ok ? r.json() : {})))
 ])
-  .then(([parts, seriesMap, languageMap]) => {
-    books = parts.flat().map(book => ({...book, series: book.series || seriesMap[book.id] || '', language: languageMap[book.id] || ''}));
+  .then(([parts, seriesMap, languageMap, metadataParts]) => {
+    const metadata = Object.assign({}, ...metadataParts);
+    books = parts.flat().map(book => {
+      const meta = metadata[book.id] || {};
+      return {...book, series: book.series || seriesMap[book.id] || '', language: languageMap[book.id] || meta.language || '', description: meta.description || ''};
+    });
     sortSelect.value='title';
     buildFilters();
     render();
