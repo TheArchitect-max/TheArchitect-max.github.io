@@ -9,9 +9,6 @@ let books = [];
 let activeCategory = 'All';
 let renderGeneration = 0;
 const mediaCache = new Map();
-const focusedQueue = [];
-let focusedWorkers = 0;
-const MAX_FOCUSED_WORKERS = 3;
 
 function normalize(v=''){ return String(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 function escapeHtml(value='') {
@@ -29,8 +26,8 @@ function sortedBooks(list){
 }
 function coverPlaceholder(book){
   const title = escapeHtml(book.title || 'Book');
-  return `<div class="card-cover-frame" data-cover-id="${escapeHtml(book.id)}" aria-label="Cover for ${title}">
-    <div class="cover-loading" aria-hidden="true"><span>RA</span></div>
+  return `<div class="card-cover-frame" data-cover-id="${escapeHtml(book.id)}" aria-label="Draft2Digital cover for ${title}">
+    <div class="cover-loading" aria-hidden="true"><span>D2D</span></div>
   </div>`;
 }
 function applyCover(book, media, generation){
@@ -42,58 +39,26 @@ function applyCover(book, media, generation){
   frame.innerHTML = `<img src="${escapeHtml(src)}" alt="Cover of ${escapeHtml(book.title)} by Rayford Aquirre" loading="lazy" decoding="async" />`;
   frame.classList.add('has-cover');
 }
-async function resolveQuickCover(book, generation){
-  if(!window.RABookMedia) return false;
-  if(mediaCache.has(book.id)) {
-    const media = mediaCache.get(book.id);
-    applyCover(book, media, generation);
-    return Boolean(media);
-  }
-  const media = await window.RABookMedia.find(book, false).catch(()=>null);
-  if(media) {
-    mediaCache.set(book.id, media);
-    applyCover(book, media, generation);
-    return true;
-  }
-  return false;
-}
-function enqueueFocusedCover(book, generation){
-  if(mediaCache.has(book.id)) return;
-  focusedQueue.push({book, generation});
-  pumpFocusedQueue();
-}
-function pumpFocusedQueue(){
-  if(!window.RABookMedia) return;
-  while(focusedWorkers < MAX_FOCUSED_WORKERS && focusedQueue.length){
-    const job = focusedQueue.shift();
-    if(job.generation !== renderGeneration) continue;
-    focusedWorkers++;
-    window.RABookMedia.find(job.book, true)
-      .then(media => {
-        if(media){
-          mediaCache.set(job.book.id, media);
-          applyCover(job.book, media, job.generation);
-        }
-      })
-      .catch(()=>{})
-      .finally(()=>{
-        focusedWorkers--;
-        pumpFocusedQueue();
-      });
-  }
-}
 async function enrichCovers(visible, generation){
   if(!window.RABookMedia) return;
-  await window.RABookMedia.loadCatalog().catch(()=>[]);
+  await window.RABookMedia.loadD2DManifest().catch(()=>({}));
   if(generation !== renderGeneration) return;
-  for(const book of visible){
-    const found = await resolveQuickCover(book, generation);
-    if(!found && generation === renderGeneration) enqueueFocusedCover(book, generation);
+  const queue=[...visible];
+  async function worker(){
+    while(queue.length && generation===renderGeneration){
+      const book=queue.shift();
+      let media=mediaCache.get(book.id);
+      if(media===undefined){
+        media=await window.RABookMedia.find(book,false).catch(()=>null);
+        mediaCache.set(book.id,media);
+      }
+      applyCover(book,media,generation);
+    }
   }
+  await Promise.all(Array.from({length:4},()=>worker()));
 }
 function render(){
   const generation = ++renderGeneration;
-  focusedQueue.length = 0;
   const rawQuery = searchInput.value.trim();
   const q = normalize(rawQuery);
   let visible = books.filter(book => {
