@@ -7,8 +7,9 @@
 .book-card{padding:14px 14px 20px;min-height:0}
 .card-bottom{padding:0 8px}
 .card-main-link{display:block}
-.detail-cover-frame{width:100%;background:#0b0c0a;border:1px solid rgba(241,239,231,.14);border-radius:4px;overflow:hidden;display:grid;place-items:center;box-shadow:0 30px 80px rgba(0,0,0,.48)}
+.detail-cover-frame{width:100%;background:#0b0c0a;border:1px solid rgba(241,239,231,.14);border-radius:4px;overflow:hidden;display:grid;place-items:center;box-shadow:0 30px 80px rgba(0,0,0,.48);position:relative}
 .detail-cover-frame img{display:block;width:100%;height:auto;max-height:78vh;object-fit:contain;object-position:center;background:#0b0c0a}
+.cover-source-label{position:absolute;left:10px;bottom:10px;padding:5px 8px;border-radius:999px;background:rgba(10,11,9,.82);border:1px solid rgba(241,239,231,.18);color:#d7d8ce;font-size:.64rem;letter-spacing:.04em;backdrop-filter:blur(8px)}
 .detail-cover-frame .book-identity{min-height:560px;border:0;box-shadow:none}
 .detail-description{white-space:pre-line}
 .detail-description.is-full{font-size:1.08rem;line-height:1.78}
@@ -19,4 +20,4 @@
 .series-volumes a.has-mini-cover{grid-template-columns:44px 44px 1fr auto}
 .collection-book.has-mini-cover{display:grid;grid-template-columns:44px 1fr auto auto;align-items:center;gap:12px}
 @media(max-width:900px){.detail-cover-frame{max-width:380px}}
-@media(max-width:620px){.book-card{padding:12px 12px 18px}.card-cover-frame{border-radius:9px}.detail-cover-frame{max-width:320px}.detail-cover-frame .book-identity{min-height:440px}.mini-cover{width:38px;flex-basis:38px}.series-volumes a.has-mini-cover{grid-template-columns:34px 38px 1fr auto}.collection-book.has-mini-cover{grid-template-columns:38px 1fr auto}}
+@media(max-width:620px){.book-card{padding:12px 12px 18px}.card-cover-frame{border-radius:9px}.detail-cover-frame{max-width:320px}.detail-cover-frame .book-identity{min-height:440px}.mini-cover{width:38px;flex-basis:38px}.series-volumes a.has-mini-cover{grid-template-columns:34px 38px 1fr auto}.collection-book.has-mini-cover{grid-template-columns:38px 1fr auto}.cover-source-label{font-size:.58rem}}
