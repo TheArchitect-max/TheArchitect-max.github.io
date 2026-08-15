@@ -92,7 +92,8 @@ Promise.all([
   fetch('data/language-map.json').then(r=>r.ok?r.json():{}),
   Promise.all([
     fetch('data/verified-metadata.json').then(r=>r.ok?r.json():{}),
-    fetch('data/verified-metadata-2.json').then(r=>r.ok?r.json():{})
+    fetch('data/verified-metadata-2.json').then(r=>r.ok?r.json():{}),
+    fetch('data/verified-metadata-3.json').then(r=>r.ok?r.json():{})
   ])
 ]).then(async ([parts, seriesMap, languageMap, metadataParts]) => {
   const verifiedMetadata = Object.assign({}, ...metadataParts);
@@ -102,9 +103,9 @@ Promise.all([
   const meta = verifiedMetadata[book.id] || {};
   const media = window.RABookMedia ? await window.RABookMedia.find(book, true).catch(()=>null) : null;
   updateMetadata(book, meta, media);
-  const retailUrl = media?.trackViewUrl || '';
+  const retailUrl = media?.trackViewUrl || meta?.sources?.[0]?.url || '';
   const d2dUrl = book.url && book.url.startsWith('http') ? book.url : '';
-  const retailLabel = window.RABookMedia?.metadataSourceLabel(media) || 'retailer';
+  const retailLabel = media?.trackViewUrl ? (window.RABookMedia?.metadataSourceLabel(media) || 'retailer') : (meta?.sources?.[0]?.label || 'retailer');
   const primaryAction = retailUrl
     ? `<a class="button button-primary" href="${escapeHtml(retailUrl)}" target="_blank" rel="noopener noreferrer">View at ${escapeHtml(retailLabel)} ↗</a>`
     : (d2dUrl ? `<a class="button button-primary" href="${escapeHtml(d2dUrl)}" target="_blank" rel="noopener noreferrer">View book ↗</a>` : '');
