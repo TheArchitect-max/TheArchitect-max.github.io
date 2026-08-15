@@ -1,6 +1,6 @@
 (() => {
   const AUTHOR = 'Rayford Aquirre';
-  const CACHE_KEY = 'ra-apple-book-media-v2';
+  const CACHE_KEY = 'ra-apple-book-media-v3';
   const CACHE_TTL = 24 * 60 * 60 * 1000;
   const countries = ['us', 'nl', 'gb'];
   let catalogPromise = null;
@@ -43,7 +43,7 @@
   }
 
   function authorMatches(item) {
-    const artist = normalize(item?.artistName || item?.artistViewUrl || '');
+    const artist = normalize(item?.artistName || '');
     return artist.includes(normalize(AUTHOR));
   }
 
@@ -84,7 +84,7 @@
       country
     });
     const data = await jsonp(`https://itunes.apple.com/search?${params}`);
-    return Array.isArray(data?.results) ? data.results.filter(authorMatches) : [];
+    return Array.isArray(data?.results) ? data.results.filter(authorMatches).map(item=>({...item,_provider:'apple'})) : [];
   }
 
   function readCache() {
@@ -126,7 +126,7 @@
     return bestScore >= 0.68 ? best : null;
   }
 
-  async function titleSearch(book, country) {
+  async function titleSearchApple(book, country) {
     const params = new URLSearchParams({
       term: `${book.title} ${AUTHOR}`,
       entity: 'ebook',
@@ -134,7 +134,37 @@
       country
     });
     const data = await jsonp(`https://itunes.apple.com/search?${params}`);
-    return bestMatch(book, Array.isArray(data?.results) ? data.results : []);
+    const results = Array.isArray(data?.results) ? data.results.map(item=>({...item,_provider:'apple'})) : [];
+    return bestMatch(book, results);
+  }
+
+  function googleItem(item) {
+    const v = item?.volumeInfo || {};
+    const images = v.imageLinks || {};
+    return {
+      _provider: 'google',
+      trackId: item?.id || '',
+      trackName: v.title || '',
+      artistName: Array.isArray(v.authors) ? v.authors.join(', ') : '',
+      description: v.description || '',
+      releaseDate: v.publishedDate || '',
+      trackViewUrl: v.infoLink || '',
+      artworkUrl100: images.extraLarge || images.large || images.medium || images.small || images.thumbnail || images.smallThumbnail || ''
+    };
+  }
+
+  async function titleSearchGoogle(book) {
+    const params = new URLSearchParams({
+      q: `intitle:${book.title} inauthor:${AUTHOR}`,
+      maxResults: '10',
+      printType: 'books',
+      projection: 'lite'
+    });
+    const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params}`);
+    if(!response.ok) return null;
+    const data = await response.json();
+    const results = Array.isArray(data?.items) ? data.items.map(googleItem) : [];
+    return bestMatch(book, results);
   }
 
   async function find(book, allowFocusedSearch = true) {
@@ -146,18 +176,27 @@
     if (!titlePromises.has(key)) {
       titlePromises.set(key, (async () => {
         for (const country of countries) {
-          const match = await titleSearch(book, country).catch(() => null);
+          const match = await titleSearchApple(book, country).catch(() => null);
           if (match) return match;
         }
-        return null;
+        return titleSearchGoogle(book).catch(() => null);
       })());
     }
     return titlePromises.get(key);
   }
 
   function artworkUrl(item, variant = 'thumb') {
-    const source = item?.artworkUrl100 || item?.artworkUrl60 || '';
+    let source = item?.artworkUrl100 || item?.artworkUrl60 || '';
     if (!source) return '';
+    source = source.replace(/^http:/i,'https:');
+    if(item?._provider === 'google'){
+      try {
+        const url = new URL(source);
+        url.searchParams.set('zoom', variant === 'detail' ? '3' : '2');
+        url.searchParams.set('edge', 'curl');
+        return url.toString();
+      } catch (_) { return source; }
+    }
     const box = variant === 'detail' ? '1400x2100bb' : '600x900bb';
     return source
       .replace(/\d+x\d+bb(?=\.(?:jpg|png|webp))/i, box)
@@ -165,7 +204,10 @@
   }
 
   function description(item) {
-    return String(item?.description || '').replace(/<br\s*\/?>/gi, '\n').trim();
+    return String(item?.description || '')
+      .replace(/<br\s*\/?>/gi, '\n')
+      .replace(/<[^>]+>/g,'')
+      .trim();
   }
 
   window.RABookMedia = {
