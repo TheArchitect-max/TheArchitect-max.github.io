@@ -1,8 +1,11 @@
 (() => {
   const AUTHOR = 'Rayford Aquirre';
-  const CACHE_KEY = 'ra-apple-book-media-v3';
+  const CACHE_KEY = 'ra-apple-book-media-v4';
   const CACHE_TTL = 24 * 60 * 60 * 1000;
   const countries = ['us', 'nl', 'gb'];
+  const LOCAL_COVERS = {
+    'massa-2026': 'assets/massa-cover.jpg'
+  };
   let catalogPromise = null;
   const titlePromises = new Map();
 
@@ -45,6 +48,17 @@
   function authorMatches(item) {
     const artist = normalize(item?.artistName || '');
     return artist.includes(normalize(AUTHOR));
+  }
+
+  function withLocalCover(book, item) {
+    const local = LOCAL_COVERS[String(book?.id || '')];
+    if(!local) return item;
+    return {
+      ...(item || {}),
+      _localArtwork: local,
+      trackName: item?.trackName || book?.title || '',
+      artistName: item?.artistName || AUTHOR
+    };
   }
 
   function dedupe(results = []) {
@@ -158,7 +172,7 @@
       q: `intitle:${book.title} inauthor:${AUTHOR}`,
       maxResults: '10',
       printType: 'books',
-      projection: 'lite'
+      projection: 'full'
     });
     const response = await fetch(`https://www.googleapis.com/books/v1/volumes?${params}`);
     if(!response.ok) return null;
@@ -170,9 +184,9 @@
   async function find(book, allowFocusedSearch = true) {
     const results = await loadCatalog().catch(() => []);
     const fromCatalog = bestMatch(book, results);
-    if (fromCatalog || !allowFocusedSearch) return fromCatalog;
+    if (fromCatalog || !allowFocusedSearch) return withLocalCover(book, fromCatalog);
     const key = normalize(book?.title || '');
-    if (!key) return null;
+    if (!key) return withLocalCover(book, null);
     if (!titlePromises.has(key)) {
       titlePromises.set(key, (async () => {
         for (const country of countries) {
@@ -182,10 +196,12 @@
         return titleSearchGoogle(book).catch(() => null);
       })());
     }
-    return titlePromises.get(key);
+    const focused = await titlePromises.get(key);
+    return withLocalCover(book, focused);
   }
 
   function artworkUrl(item, variant = 'thumb') {
+    if(item?._localArtwork) return item._localArtwork;
     let source = item?.artworkUrl100 || item?.artworkUrl60 || '';
     if (!source) return '';
     source = source.replace(/^http:/i,'https:');
@@ -193,7 +209,6 @@
       try {
         const url = new URL(source);
         url.searchParams.set('zoom', variant === 'detail' ? '3' : '2');
-        url.searchParams.set('edge', 'curl');
         return url.toString();
       } catch (_) { return source; }
     }
