@@ -7,6 +7,11 @@ const sortSelect = document.getElementById('sortSelect');
 const seriesOnly = document.getElementById('seriesOnly');
 let books = [];
 let activeCategory = 'All';
+let renderGeneration = 0;
+const mediaCache = new Map();
+const focusedQueue = [];
+let focusedWorkers = 0;
+const MAX_FOCUSED_WORKERS = 3;
 
 function normalize(v=''){ return String(v).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,''); }
 function escapeHtml(value='') {
@@ -22,7 +27,73 @@ function sortedBooks(list){
   });
   return list;
 }
+function coverPlaceholder(book){
+  const title = escapeHtml(book.title || 'Book');
+  return `<div class="card-cover-frame" data-cover-id="${escapeHtml(book.id)}" aria-label="Cover for ${title}">
+    <div class="cover-loading" aria-hidden="true"><span>RA</span></div>
+  </div>`;
+}
+function applyCover(book, media, generation){
+  if(generation !== renderGeneration || !media) return;
+  const frame = grid.querySelector(`[data-cover-id="${CSS.escape(String(book.id))}"]`);
+  if(!frame) return;
+  const src = window.RABookMedia?.artworkUrl(media, 'thumb');
+  if(!src) return;
+  frame.innerHTML = `<img src="${escapeHtml(src)}" alt="Cover of ${escapeHtml(book.title)} by Rayford Aquirre" loading="lazy" decoding="async" />`;
+  frame.classList.add('has-cover');
+}
+async function resolveQuickCover(book, generation){
+  if(!window.RABookMedia) return false;
+  if(mediaCache.has(book.id)) {
+    const media = mediaCache.get(book.id);
+    applyCover(book, media, generation);
+    return Boolean(media);
+  }
+  const media = await window.RABookMedia.find(book, false).catch(()=>null);
+  if(media) {
+    mediaCache.set(book.id, media);
+    applyCover(book, media, generation);
+    return true;
+  }
+  return false;
+}
+function enqueueFocusedCover(book, generation){
+  if(mediaCache.has(book.id)) return;
+  focusedQueue.push({book, generation});
+  pumpFocusedQueue();
+}
+function pumpFocusedQueue(){
+  if(!window.RABookMedia) return;
+  while(focusedWorkers < MAX_FOCUSED_WORKERS && focusedQueue.length){
+    const job = focusedQueue.shift();
+    if(job.generation !== renderGeneration) continue;
+    focusedWorkers++;
+    window.RABookMedia.find(job.book, true)
+      .then(media => {
+        if(media){
+          mediaCache.set(job.book.id, media);
+          applyCover(job.book, media, job.generation);
+        }
+      })
+      .catch(()=>{})
+      .finally(()=>{
+        focusedWorkers--;
+        pumpFocusedQueue();
+      });
+  }
+}
+async function enrichCovers(visible, generation){
+  if(!window.RABookMedia) return;
+  await window.RABookMedia.loadCatalog().catch(()=>[]);
+  if(generation !== renderGeneration) return;
+  for(const book of visible){
+    const found = await resolveQuickCover(book, generation);
+    if(!found && generation === renderGeneration) enqueueFocusedCover(book, generation);
+  }
+}
 function render(){
+  const generation = ++renderGeneration;
+  focusedQueue.length = 0;
   const rawQuery = searchInput.value.trim();
   const q = normalize(rawQuery);
   let visible = books.filter(book => {
@@ -46,8 +117,11 @@ function render(){
     const detailUrl = `book.html?id=${encodeURIComponent(book.id)}`;
     return `<article class="book-card" data-title="${title}">
       <a class="card-main-link" href="${detailUrl}" aria-label="Open ${title}">
-        <h3 class="card-title">${title}</h3>
-        <div class="card-series">${series}</div>
+        ${coverPlaceholder(book)}
+        <div class="card-copy">
+          <h3 class="card-title">${title}</h3>
+          <div class="card-series">${series}</div>
+        </div>
       </a>
       <div class="card-bottom">
         <span class="card-category">${category}${language}</span>
@@ -55,6 +129,7 @@ function render(){
       </div>
     </article>`;
   }).join('');
+  enrichCovers(visible, generation);
 }
 function buildFilters(){
   const categories = ['All'];
