@@ -56,7 +56,7 @@ function renderRelated(book, books) {
   relatedBooks.innerHTML = matches.map(b => `<a class="related-card" href="book.html?id=${encodeURIComponent(b.id)}"><span>${escapeHtml(b.series || '')}</span><strong>${escapeHtml(b.title)}</strong></a>`).join('');
 }
 function renderFacts(book, meta={}, media=null) {
-  const language = book.language || meta.language || media?.formattedPrice && media?.country ? '' : meta.language;
+  const language = book.language || meta.language || '';
   const rows = [
     ['Format','Ebook'],
     ['Catalog ID',book.id],
